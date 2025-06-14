@@ -19,6 +19,7 @@ const allowedOrigins = [
   process.env.FRONTEND_URL, // For production deployment
   process.env.RAILWAY_STATIC_URL, // Railway specific
   process.env.RENDER_EXTERNAL_URL, // Render specific
+  /^https:\/\/.*\.railway\.app$/, // Allow all Railway domains
 ].filter(Boolean); // Remove undefined values
 
 app.use(cors({
@@ -26,14 +27,21 @@ app.use(cors({
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
+    // Check if origin is in allowed list
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
-      // For development, be more permissive
-      if (process.env.NODE_ENV !== 'production') {
+      // Check if origin matches Railway domain pattern
+      const isRailwayDomain = /^https:\/\/.*\.railway\.app$/.test(origin);
+      if (isRailwayDomain) {
         callback(null, true);
       } else {
-        callback(new Error('Not allowed by CORS'));
+        // For development, be more permissive
+        if (process.env.NODE_ENV !== 'production') {
+          callback(null, true);
+        } else {
+          callback(new Error('Not allowed by CORS'));
+        }
       }
     }
   },
