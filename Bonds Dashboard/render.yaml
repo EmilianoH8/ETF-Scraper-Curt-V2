@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: bond-dashboard
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm run start:production
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: VITE_FRED_API_KEY
+        sync: false # Set this manually in Render dashboard
+    autoDeploy: true 

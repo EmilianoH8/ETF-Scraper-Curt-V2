@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom financial dashboard styles */
+@layer base {
+  body {
+    @apply font-financial text-gray-900 bg-dashboard-bg;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  .metric-card {
+    @apply bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow duration-200;
+  }
+  
+  .metric-value {
+    @apply text-2xl font-semibold;
+  }
+  
+  .metric-change-positive {
+    @apply text-bull-green;
+  }
+  
+  .metric-change-negative {
+    @apply text-bear-red;
+  }
+  
+  .metric-change-neutral {
+    @apply text-financial-gray;
+  }
+  
+  .trend-arrow {
+    @apply inline-flex items-center justify-center w-5 h-5 rounded-full text-xs font-medium;
+  }
+  
+  .dashboard-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4;
+  }
+  
+  .chart-container {
+    @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
+  }
+  
+  .signal-indicator-bullish {
+    @apply bg-bull-green text-white;
+  }
+  
+  .signal-indicator-bearish {
+    @apply bg-bear-red text-white;
+  }
+  
+  .signal-indicator-neutral {
+    @apply bg-neutral-blue text-white;
+  }
+  
+  .loading-shimmer {
+    @apply animate-pulse bg-gray-200 rounded;
+  }
+} 
