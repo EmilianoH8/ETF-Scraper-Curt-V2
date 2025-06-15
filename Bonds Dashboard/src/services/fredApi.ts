@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { FREDSeries, DashboardData, TreasuryYield, YieldSpread, PolicyRate, MarketIndicator, CreditSpread, YieldCurvePoint, APIError } from '../types/bonds';
+import { FREDSeries, DashboardData, TreasuryYield, YieldSpread, PolicyRate, MarketIndicator, CreditSpread, YieldCurvePoint } from '../types/bonds';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' ? `${window.location.origin}/api` : 'http://localhost:3001/api');
 
 // FRED Series IDs
 export const FRED_SERIES = {
@@ -61,24 +61,7 @@ class FREDApiService {
     }
   }
 
-  private async fetchSeries(seriesId: string): Promise<FREDSeries | null> {
-    try {
-      const response = await axios.get<BackendFREDResponse>(`${API_BASE_URL}/fred/series/${seriesId}`, {
-        timeout: 15000
-      });
-
-      return {
-        id: response.data.seriesId,
-        title: FRED_SERIES[seriesId as keyof typeof FRED_SERIES] || response.data.title,
-        value: response.data.value,
-        date: response.data.date,
-        change: response.data.change
-      };
-    } catch (error: any) {
-      console.error(`Error fetching series ${seriesId}:`, error.message);
-      return null;
-    }
-  }
+  // Removed unused fetchSeries method - using fetchMultipleSeries instead
 
   private async fetchMultipleSeries(seriesIds: string[]): Promise<(FREDSeries | null)[]> {
     try {

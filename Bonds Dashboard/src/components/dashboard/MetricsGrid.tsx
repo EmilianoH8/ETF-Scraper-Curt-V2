@@ -1,6 +1,6 @@
 import React from 'react';
 import { TrendingUp, TrendingDown, Minus, AlertTriangle } from 'lucide-react';
-import { DashboardData } from '../types/bonds';
+import { DashboardData, TreasuryYield, MarketIndicator, YieldSpread, PolicyRate, CreditSpread } from '../../types/bonds';
 
 interface MetricsGridProps {
   data: DashboardData;
@@ -67,11 +67,11 @@ const MetricsGrid: React.FC<MetricsGridProps> = ({ data }) => {
   };
 
   // Filter data for specific sections
-  const treasuryYieldsFiltered = data.treasuryYields.filter(yield_ => 
+  const treasuryYieldsFiltered = data.treasuryYields.filter((yield_: TreasuryYield) => 
     ['2Y', '10Y', '30Y'].includes(yield_.maturity)
   );
 
-  const marketIndicatorsFiltered = data.marketIndicators.filter(indicator =>
+  const marketIndicatorsFiltered = data.marketIndicators.filter((indicator: MarketIndicator) =>
     ['S&P 500', 'VIX', 'Dollar Index'].includes(indicator.name)
   );
 
@@ -87,7 +87,7 @@ const MetricsGrid: React.FC<MetricsGridProps> = ({ data }) => {
           Treasury Yields
         </h3>
         <div className="grid grid-cols-3 gap-2">
-          {treasuryYieldsFiltered.map((yield_) => (
+          {treasuryYieldsFiltered.map((yield_: TreasuryYield) => (
             <div 
               key={yield_.maturity} 
               className="bg-gray-50 p-2 rounded border cursor-pointer hover:bg-gray-100 hover:shadow-md transition-all duration-200"
@@ -123,7 +123,7 @@ const MetricsGrid: React.FC<MetricsGridProps> = ({ data }) => {
           Spreads
         </h3>
         <div className="grid grid-cols-2 gap-2">
-          {data.yieldSpreads.map((spread) => (
+          {data.yieldSpreads.map((spread: YieldSpread) => (
             <div 
               key={spread.name} 
               className="bg-gray-50 p-2 rounded border cursor-pointer hover:bg-gray-100 hover:shadow-md transition-all duration-200"
@@ -163,7 +163,7 @@ const MetricsGrid: React.FC<MetricsGridProps> = ({ data }) => {
           Market Indicators
         </h3>
         <div className="grid grid-cols-3 gap-2">
-          {marketIndicatorsFiltered.map((indicator) => (
+          {marketIndicatorsFiltered.map((indicator: MarketIndicator) => (
             <div 
               key={indicator.name} 
               className="bg-gray-50 p-2 rounded border cursor-pointer hover:bg-gray-100 hover:shadow-md transition-all duration-200"
@@ -203,7 +203,7 @@ const MetricsGrid: React.FC<MetricsGridProps> = ({ data }) => {
         </h3>
         <div className="grid grid-cols-2 gap-2">
           {/* Policy Rates */}
-          {policyRatesFiltered.map((rate) => (
+          {policyRatesFiltered.map((rate: PolicyRate) => (
             <div 
               key={rate.name} 
               className="bg-gray-50 p-2 rounded border cursor-pointer hover:bg-gray-100 hover:shadow-md transition-all duration-200"
@@ -229,7 +229,7 @@ const MetricsGrid: React.FC<MetricsGridProps> = ({ data }) => {
           ))}
 
           {/* Credit Spreads (IG and HY) */}
-          {creditSpreadsFiltered.map((spread) => (
+          {creditSpreadsFiltered.map((spread: CreditSpread) => (
             <div 
               key={spread.name} 
               className="bg-gray-50 p-2 rounded border cursor-pointer hover:bg-gray-100 hover:shadow-md transition-all duration-200"

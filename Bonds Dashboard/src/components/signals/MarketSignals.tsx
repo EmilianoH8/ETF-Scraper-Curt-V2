@@ -1,5 +1,5 @@
 import React from 'react';
-import { DashboardData } from '../types/bonds';
+import { DashboardData, YieldSpread, CreditSpread } from '../../types/bonds';
 
 interface MarketSignalsProps {
   data: DashboardData;
@@ -17,9 +17,9 @@ interface SignalResult {
 
 const MarketSignals: React.FC<MarketSignalsProps> = ({ data }) => {
   // Extract current indicator values
-  const yieldCurveSpread = data.yieldSpreads.find(s => s.name === '10Y-2Y Spread')?.value || -0.09;
+  const yieldCurveSpread = data.yieldSpreads.find((s: YieldSpread) => s.name === '10Y-2Y Spread')?.value || -0.09;
   const fedRate = 5.25; // Mock current Fed Funds rate
-  const creditSpread = data.creditSpreads.find(s => s.rating === 'IG')?.spread || 150;
+  const creditSpread = data.creditSpreads.find((s: CreditSpread) => s.rating === 'IG')?.spread || 150;
   const creditSpreadPct = creditSpread / 100; // Convert bps to percentage
   const vix = 18.5; // Mock VIX value
 
