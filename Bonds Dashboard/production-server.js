@@ -11,6 +11,7 @@ const __dirname = path.dirname(__filename);
 
 // Load environment variables
 dotenv.config({ path: './server/.env.local' });
+dotenv.config(); // Also load from standard .env file
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -30,15 +31,27 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
+    // Check if origin is in allowed list
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
-      if (process.env.NODE_ENV !== 'production') {
+      // Check for Render domain pattern
+      const isRenderDomain = /^https:\/\/.*\.onrender\.com$/.test(origin);
+      // Check for Railway domain pattern  
+      const isRailwayDomain = /^https:\/\/.*\.railway\.app$/.test(origin);
+      
+      if (isRenderDomain || isRailwayDomain) {
         callback(null, true);
       } else {
-        callback(new Error('Not allowed by CORS'));
+        // For development, be more permissive
+        if (process.env.NODE_ENV !== 'production') {
+          callback(null, true);
+        } else {
+          callback(new Error('Not allowed by CORS'));
+        }
       }
     }
   },

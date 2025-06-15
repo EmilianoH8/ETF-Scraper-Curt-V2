@@ -156,12 +156,15 @@ app.post('/api/fred/batch', async (req, res) => {
 
     console.log(`Fetching ${seriesIds.length} FRED series in batch`);
 
+    // Create base URL for current deployment
+    const baseUrl = req.protocol + '://' + req.get('host');
+
     // Fetch all series with some delay to respect rate limits
     const promises = seriesIds.map((seriesId, index) => 
       new Promise(resolve => {
         setTimeout(async () => {
           try {
-            const response = await axios.get(`http://localhost:${PORT}/api/fred/series/${seriesId}`);
+            const response = await axios.get(`${baseUrl}/api/fred/series/${seriesId}`);
             resolve({ success: true, data: response.data });
           } catch (error) {
             console.error(`Error in batch for ${seriesId}:`, error.message);
@@ -200,10 +203,10 @@ app.post('/api/fred/batch', async (req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Bond Dashboard API Server running on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Bond Dashboard API Server running on http://0.0.0.0:${PORT}`);
   console.log(`📊 FRED API Key configured: ${FRED_API_KEY ? 'Yes' : 'No'}`);
-  console.log(`🔗 Frontend should be at: http://localhost:3000`);
+  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
   
   if (!FRED_API_KEY) {
     console.log('⚠️  Warning: VITE_FRED_API_KEY not found in .env.local');
