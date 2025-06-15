@@ -120,22 +120,22 @@ const App: React.FC = () => {
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Bond Market Dashboard</h1>
-              <p className="text-sm text-gray-600">JPM Asset Management Municipal Research</p>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center h-auto sm:h-16 py-4 sm:py-0">
+            <div className="mb-4 sm:mb-0">
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Bond Market Dashboard</h1>
+              <p className="text-xs sm:text-sm text-gray-600">JPM Asset Management Municipal Research</p>
             </div>
             
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
               {activeTab === 'dashboard' && (
                 <>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-gray-600 order-2 sm:order-1">
                     Last updated: {lastRefresh.toLocaleTimeString()}
                   </div>
                   <button
                     onClick={handleRefresh}
                     disabled={loading}
-                    className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors ${
+                    className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors order-1 sm:order-2 ${
                       loading
                         ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                         : 'bg-neutral-blue text-white hover:bg-blue-600'
@@ -150,27 +150,27 @@ const App: React.FC = () => {
           </div>
           
           {/* Tab Navigation */}
-          <div className="border-t border-gray-200">
-            <nav className="flex space-x-8" aria-label="Tabs">
+          <div className="border-t border-gray-200 pt-4 pb-4 sm:pb-0">
+            <nav className="flex space-x-8">
               <button
                 onClick={() => setActiveTab('dashboard')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
                   activeTab === 'dashboard'
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-neutral-blue text-neutral-blue'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                📊 Dashboard
+                Market Dashboard
               </button>
               <button
                 onClick={() => setActiveTab('guide')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
                   activeTab === 'guide'
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-neutral-blue text-neutral-blue'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                📖 Interpretation Guide
+                Interpretation Guide
               </button>
             </nav>
           </div>
@@ -178,14 +178,19 @@ const App: React.FC = () => {
       </header>
 
       {/* Main Content */}
-      <main className="py-8">
+      <main className="py-6 sm:py-8">
         {activeTab === 'dashboard' ? (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {dashboardData && (
-              <div className="space-y-8">
+              <div className="space-y-6 sm:space-y-8">
                 {/* Metrics Grid */}
                 <section>
-                  <h2 className="text-lg font-semibold text-gray-900 mb-4">Key Metrics</h2>
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-semibold text-gray-900">Key Metrics</h2>
+                    <div className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                      Changes: Day-over-Day
+                    </div>
+                  </div>
                   <MetricsGrid data={dashboardData} />
                 </section>
 

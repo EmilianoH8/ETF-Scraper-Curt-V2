@@ -66,6 +66,23 @@ const MetricsGrid: React.FC<MetricsGridProps> = ({ data }) => {
     return change > 0 ? 'text-bear-red' : 'text-bull-green';
   };
 
+  // Helper function to format changes with proper decimal precision
+  const formatChange = (change: number, type: 'bps' | 'percent' | 'points' = 'bps'): string => {
+    const roundedChange = parseFloat(change.toFixed(2));
+    const sign = roundedChange > 0 ? '+' : '';
+    
+    switch (type) {
+      case 'bps':
+        return `${sign}${Math.round(roundedChange * 100)} bps`;
+      case 'percent':
+        return `${sign}${roundedChange.toFixed(2)}%`;
+      case 'points':
+        return `${sign}${roundedChange.toFixed(2)}`;
+      default:
+        return `${sign}${roundedChange.toFixed(2)}`;
+    }
+  };
+
   // Filter data for specific sections
   const treasuryYieldsFiltered = data.treasuryYields.filter((yield_: TreasuryYield) => 
     ['2Y', '10Y', '30Y'].includes(yield_.maturity)
@@ -76,21 +93,20 @@ const MetricsGrid: React.FC<MetricsGridProps> = ({ data }) => {
   );
 
   const policyRatesFiltered = data.policyRates;
-
   const creditSpreadsFiltered = data.creditSpreads;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-full">
+    <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 h-full">
       {/* Treasury Yields Box */}
       <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
         <h3 className="text-base font-semibold text-gray-800 mb-3 border-b border-gray-100 pb-1">
           Treasury Yields
         </h3>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
           {treasuryYieldsFiltered.map((yield_: TreasuryYield) => (
             <div 
               key={yield_.maturity} 
-              className="bg-gray-50 p-2 rounded border cursor-pointer hover:bg-gray-100 hover:shadow-md transition-all duration-200"
+              className="bg-gray-50 p-3 rounded border cursor-pointer hover:bg-gray-100 hover:shadow-md transition-all duration-200"
               onClick={() => handleIndicatorClick(yield_.maturity, 'treasury')}
               role="button"
               tabIndex={0}
@@ -103,14 +119,14 @@ const MetricsGrid: React.FC<MetricsGridProps> = ({ data }) => {
               title={`Click to view ${yield_.maturity} Treasury data on FRED`}
             >
               <div className="flex justify-between items-center mb-1">
-                <h4 className="text-xs font-medium text-gray-600">{yield_.maturity}</h4>
+                <h4 className="text-sm font-medium text-gray-600">{yield_.maturity}</h4>
                 <div className={`${getTrendColor(yield_.trend)}`}>
                   {getTrendIcon(yield_.trend)}
                 </div>
               </div>
-              <div className="text-lg font-bold text-gray-900">{yield_.yield.toFixed(2)}%</div>
+              <div className="text-xl font-bold text-gray-900 mb-1">{yield_.yield.toFixed(2)}%</div>
               <div className={`text-xs ${getChangeColor(yield_.change)}`}>
-                {yield_.changeBps > 0 ? '+' : ''}{yield_.changeBps} bps
+                {formatChange(yield_.change, 'bps')}
               </div>
             </div>
           ))}
@@ -122,11 +138,11 @@ const MetricsGrid: React.FC<MetricsGridProps> = ({ data }) => {
         <h3 className="text-base font-semibold text-gray-800 mb-3 border-b border-gray-100 pb-1">
           Spreads
         </h3>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {data.yieldSpreads.map((spread: YieldSpread) => (
             <div 
               key={spread.name} 
-              className="bg-gray-50 p-2 rounded border cursor-pointer hover:bg-gray-100 hover:shadow-md transition-all duration-200"
+              className="bg-gray-50 p-3 rounded border cursor-pointer hover:bg-gray-100 hover:shadow-md transition-all duration-200"
               onClick={() => handleIndicatorClick(spread.name, 'spreads')}
               role="button"
               tabIndex={0}
@@ -139,18 +155,18 @@ const MetricsGrid: React.FC<MetricsGridProps> = ({ data }) => {
               title={`Click to view ${spread.name} data on FRED`}
             >
               <div className="flex justify-between items-center mb-1">
-                <h4 className="text-xs font-medium text-gray-600 truncate">{spread.name}</h4>
+                <h4 className="text-sm font-medium text-gray-600 truncate pr-2">{spread.name}</h4>
                 {spread.isInverted && (
                   <div title="Inverted Curve">
-                    <AlertTriangle className="w-3 h-3 text-yellow-500" />
+                    <AlertTriangle className="w-3 h-3 text-yellow-500 flex-shrink-0" />
                   </div>
                 )}
               </div>
-              <div className="text-lg font-bold text-gray-900">
+              <div className="text-xl font-bold text-gray-900 mb-1">
                 {spread.value >= 0 ? '+' : ''}{spread.value.toFixed(2)}%
               </div>
               <div className={`text-xs ${getChangeColor(spread.change)}`}>
-                {spread.change > 0 ? '+' : ''}{(spread.change * 100).toFixed(0)} bps
+                {formatChange(spread.change, 'bps')}
               </div>
             </div>
           ))}
@@ -162,11 +178,11 @@ const MetricsGrid: React.FC<MetricsGridProps> = ({ data }) => {
         <h3 className="text-base font-semibold text-gray-800 mb-3 border-b border-gray-100 pb-1">
           Market Indicators
         </h3>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
           {marketIndicatorsFiltered.map((indicator: MarketIndicator) => (
             <div 
               key={indicator.name} 
-              className="bg-gray-50 p-2 rounded border cursor-pointer hover:bg-gray-100 hover:shadow-md transition-all duration-200"
+              className="bg-gray-50 p-3 rounded border cursor-pointer hover:bg-gray-100 hover:shadow-md transition-all duration-200"
               onClick={() => handleIndicatorClick(indicator.name, 'market')}
               role="button"
               tabIndex={0}
@@ -179,17 +195,17 @@ const MetricsGrid: React.FC<MetricsGridProps> = ({ data }) => {
               title={`Click to view ${indicator.name} data on FRED`}
             >
               <div className="mb-1">
-                <h4 className="text-xs font-medium text-gray-600 truncate">{indicator.name}</h4>
+                <h4 className="text-sm font-medium text-gray-600 truncate">{indicator.name}</h4>
               </div>
-              <div className="text-lg font-bold text-gray-900">
+              <div className="text-xl font-bold text-gray-900 mb-1">
                 {indicator.name === 'S&P 500' 
                   ? indicator.value.toLocaleString('en-US', { maximumFractionDigits: 0 })
                   : indicator.value.toFixed(2)
                 }
               </div>
               <div className={`text-xs ${getChangeColor(indicator.change)}`}>
-                {indicator.change > 0 ? '+' : ''}{indicator.change.toFixed(2)} 
-                ({indicator.changePercent > 0 ? '+' : ''}{indicator.changePercent.toFixed(2)}%)
+                {formatChange(indicator.change, 'points')} 
+                ({formatChange(indicator.changePercent / 100, 'percent')})
               </div>
             </div>
           ))}
@@ -201,12 +217,12 @@ const MetricsGrid: React.FC<MetricsGridProps> = ({ data }) => {
         <h3 className="text-base font-semibold text-gray-800 mb-3 border-b border-gray-100 pb-1">
           Rates & Credit
         </h3>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {/* Policy Rates */}
           {policyRatesFiltered.map((rate: PolicyRate) => (
             <div 
               key={rate.name} 
-              className="bg-gray-50 p-2 rounded border cursor-pointer hover:bg-gray-100 hover:shadow-md transition-all duration-200"
+              className="bg-gray-50 p-3 rounded border cursor-pointer hover:bg-gray-100 hover:shadow-md transition-all duration-200"
               onClick={() => handleIndicatorClick(rate.name, 'rates')}
               role="button"
               tabIndex={0}
@@ -219,11 +235,11 @@ const MetricsGrid: React.FC<MetricsGridProps> = ({ data }) => {
               title={`Click to view ${rate.name} data on FRED`}
             >
               <div className="mb-1">
-                <h4 className="text-xs font-medium text-gray-600 truncate">{rate.name}</h4>
+                <h4 className="text-sm font-medium text-gray-600 truncate">{rate.name}</h4>
               </div>
-              <div className="text-lg font-bold text-gray-900">{rate.rate.toFixed(2)}%</div>
+              <div className="text-xl font-bold text-gray-900 mb-1">{rate.rate.toFixed(2)}%</div>
               <div className={`text-xs ${getChangeColor(rate.change)}`}>
-                {rate.change > 0 ? '+' : ''}{(rate.change * 100).toFixed(0)} bps
+                {formatChange(rate.change, 'bps')}
               </div>
             </div>
           ))}
@@ -232,7 +248,7 @@ const MetricsGrid: React.FC<MetricsGridProps> = ({ data }) => {
           {creditSpreadsFiltered.map((spread: CreditSpread) => (
             <div 
               key={spread.name} 
-              className="bg-gray-50 p-2 rounded border cursor-pointer hover:bg-gray-100 hover:shadow-md transition-all duration-200"
+              className="bg-gray-50 p-3 rounded border cursor-pointer hover:bg-gray-100 hover:shadow-md transition-all duration-200"
               onClick={() => handleIndicatorClick(spread.name, 'credit')}
               role="button"
               tabIndex={0}
@@ -245,16 +261,16 @@ const MetricsGrid: React.FC<MetricsGridProps> = ({ data }) => {
               title={`Click to view ${spread.name} data on FRED`}
             >
               <div className="flex justify-between items-center mb-1">
-                <h4 className="text-xs font-medium text-gray-600 truncate">{spread.name}</h4>
-                <span className={`text-xs px-1 py-0.5 rounded ${
+                <h4 className="text-sm font-medium text-gray-600 truncate pr-2">{spread.name}</h4>
+                <span className={`text-xs px-2 py-0.5 rounded flex-shrink-0 ${
                   spread.rating === 'IG' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
                 }`}>
                   {spread.rating}
                 </span>
               </div>
-              <div className="text-lg font-bold text-gray-900">{spread.spread} bps</div>
+              <div className="text-xl font-bold text-gray-900 mb-1">{Math.round(spread.spread)} bps</div>
               <div className={`text-xs ${getChangeColor(spread.change)}`}>
-                {spread.change > 0 ? '+' : ''}{spread.change} bps
+                {formatChange(spread.change, 'bps')}
               </div>
             </div>
           ))}

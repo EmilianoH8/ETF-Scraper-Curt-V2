@@ -1,4 +1,5 @@
 import React from 'react';
+import { TrendingUp, TrendingDown, AlertTriangle, Target, BarChart3 } from 'lucide-react';
 import { DashboardData, YieldSpread, CreditSpread } from '../../types/bonds';
 
 interface MarketSignalsProps {
@@ -12,7 +13,6 @@ interface SignalResult {
   sentiment: SignalSentiment;
   confidence: ConfidenceLevel;
   text: string;
-  divergences?: string[];
 }
 
 const MarketSignals: React.FC<MarketSignalsProps> = ({ data }) => {
@@ -29,7 +29,12 @@ const MarketSignals: React.FC<MarketSignalsProps> = ({ data }) => {
   const prevCreditSpread = creditSpreadPct - 0.1;
   const prevVix = 16.2;
 
-  // Calculate changes
+  // Calculate changes with proper precision
+  const formatChange = (change: number, decimals: number = 0): string => {
+    const rounded = parseFloat(change.toFixed(decimals));
+    return rounded >= 0 ? `+${rounded}` : `${rounded}`;
+  };
+
   const yieldSpreadChange = yieldCurveSpread - prevYieldSpread;
   const fedRateChange = fedRate - prevFedRate;
   const creditSpreadChange = creditSpreadPct - prevCreditSpread;
@@ -80,29 +85,29 @@ const MarketSignals: React.FC<MarketSignalsProps> = ({ data }) => {
     return { sentiment, confidence, text };
   };
 
-  // 2. Growth vs Recession Signal
-  const calculateGrowthSignal = (): SignalResult => {
+  // 2. Yield Curve Signal
+  const calculateYieldCurveSignal = (): SignalResult => {
     let sentiment: SignalSentiment;
     let text = "";
 
-    if (yieldCurveSpread > 1.0 && fedRate <= 3 && creditSpreadPct < 1.5) {
+    if (yieldCurveSpread > 1.0) {
       sentiment = 'Strong Bullish';
-      text = `Yield curve remains comfortably positive at ${yieldCurveSpread.toFixed(2)}%, suggesting continued expansion.`;
-    } else if (yieldCurveSpread > 0.5) {
+      text = `Steep yield curve at ${yieldCurveSpread.toFixed(2)}% signals robust growth expectations and healthy economic conditions.`;
+    } else if (yieldCurveSpread > 0.3) {
       sentiment = 'Bullish';
-      text = `Curve at ${yieldCurveSpread.toFixed(2)}% indicates moderate growth expectations.`;
+      text = `Positive yield curve at ${yieldCurveSpread.toFixed(2)}% maintains constructive economic outlook.`;
     } else if (yieldCurveSpread > 0) {
       sentiment = 'Neutral';
-      text = `Curve flattening to ${yieldCurveSpread.toFixed(2)}% raises growth concerns for H2 2025.`;
+      text = `Flattening curve at ${yieldCurveSpread.toFixed(2)}% suggests moderating growth expectations.`;
     } else if (yieldCurveSpread > -0.5) {
       sentiment = 'Bearish';
-      text = `Inverted curve at ${yieldCurveSpread.toFixed(2)}% historically signals recession within 12-18 months.`;
+      text = `Inverted curve at ${yieldCurveSpread.toFixed(2)}% historically precedes economic slowdowns.`;
     } else {
       sentiment = 'Strong Bearish';
-      text = `Deeply inverted curve at ${yieldCurveSpread.toFixed(2)}% indicates imminent recession risk.`;
+      text = `Deeply inverted curve at ${yieldCurveSpread.toFixed(2)}% indicates significant recession risk.`;
     }
 
-    const confidence: ConfidenceLevel = Math.abs(yieldCurveSpread) > 0.5 ? 'High' : 'Moderate';
+    const confidence: ConfidenceLevel = Math.abs(yieldSpreadChange) >= 0.1 ? 'High' : 'Moderate';
 
     return { sentiment, confidence, text };
   };
@@ -161,128 +166,133 @@ const MarketSignals: React.FC<MarketSignalsProps> = ({ data }) => {
     return { sentiment, confidence, text };
   };
 
-  // 5. Key Divergences
-  const calculateDivergences = (): SignalResult => {
-    const divergences = [];
-
-    if (vix < 20 && creditSpreadPct > 2.0) {
-      divergences.push("Bond markets pricing stress while equities remain calm");
-    }
-    if (yieldCurveSpread > 0 && creditSpreadPct > 2.0) {
-      divergences.push("Positive yield curve conflicts with credit stress");
-    }
-    if (fedRateChange < 0 && creditSpreadPct > prevCreditSpread) {
-      divergences.push("Fed easing but financial conditions still tightening");
-    }
-
-    let sentiment: SignalSentiment = 'Neutral';
+  // 5. Policy Divergence
+  const calculatePolicyDivergence = (): SignalResult => {
+    const realYield = fedRate - 2.5; // Assume 2.5% inflation target
+    
+    let sentiment: SignalSentiment;
     let text = "";
 
-    if (divergences.length === 0) {
-      text = "No significant divergences detected. Indicators showing logical consistency.";
-    } else if (divergences.length === 1) {
-      text = `Minor divergence: ${divergences[0]}. Monitor for confirmation.`;
+    if (realYield < -1) {
+      sentiment = 'Strong Bullish';
+      text = `Deeply negative real rates at ${realYield.toFixed(1)}% provide massive monetary stimulus.`;
+    } else if (realYield < 0) {
+      sentiment = 'Bullish';
+      text = `Negative real yields support risk assets and economic activity.`;
+    } else if (realYield < 1) {
+      sentiment = 'Neutral';
+      text = `Modest positive real rates maintain balanced monetary conditions.`;
+    } else if (realYield < 2) {
       sentiment = 'Bearish';
+      text = `Restrictive real rates beginning to constrain economic activity.`;
     } else {
-      text = `Multiple divergences detected requiring attention.`;
       sentiment = 'Strong Bearish';
+      text = `Highly restrictive real rates at ${realYield.toFixed(1)}% likely to dampen growth significantly.`;
     }
 
-    const confidence: ConfidenceLevel = divergences.length === 0 ? 'High' : 'Low';
+    const confidence: ConfidenceLevel = Math.abs(fedRateChange) >= 0.5 ? 'High' : 'Moderate';
 
-    return { sentiment, confidence, text, divergences };
+    return { sentiment, confidence, text };
   };
 
-  // Calculate all signals
+  const overallSignal = calculateOverallSentiment();
+  const yieldCurveSignal = calculateYieldCurveSignal();
+  const financialConditionsSignal = calculateFinancialConditions();
+  const riskSentimentSignal = calculateRiskSentiment();
+  const policyDivergenceSignal = calculatePolicyDivergence();
+
   const signals = [
-    { title: "Overall Market Sentiment", result: calculateOverallSentiment(), icon: "📊" },
-    { title: "Growth vs Recession Signal", result: calculateGrowthSignal(), icon: "📈" },
-    { title: "Financial Conditions", result: calculateFinancialConditions(), icon: "🏦" },
-    { title: "Risk Sentiment", result: calculateRiskSentiment(), icon: "⚡" },
-    { title: "Key Divergences", result: calculateDivergences(), icon: "⚠️" }
+    { id: 'overall', name: 'Overall Market', icon: <BarChart3 className="w-4 h-4" />, ...overallSignal },
+    { id: 'yield-curve', name: 'Yield Curve', icon: <TrendingUp className="w-4 h-4" />, ...yieldCurveSignal },
+    { id: 'financial', name: 'Financial Conditions', icon: <Target className="w-4 h-4" />, ...financialConditionsSignal },
+    { id: 'risk', name: 'Risk Sentiment', icon: <AlertTriangle className="w-4 h-4" />, ...riskSentimentSignal },
+    { id: 'policy', name: 'Policy Stance', icon: <TrendingDown className="w-4 h-4" />, ...policyDivergenceSignal }
   ];
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold text-gray-900">Market Signals</h2>
-        <div className="text-sm text-gray-500">
-          Updated: {new Date().toLocaleTimeString()}
-        </div>
+      {/* Header */}
+      <div className="text-center">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Market Signals Analysis</h2>
+        <p className="text-sm text-gray-600">Real-time interpretation of key market indicators</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {signals.map((signal, index) => (
-          <div key={index} className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center space-x-3">
-                <span className="text-2xl">{signal.icon}</span>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">{signal.title}</h3>
-                  <div className="flex items-center space-x-3 mt-1">
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getSentimentColor(signal.result.sentiment)}`}>
-                      {signal.result.sentiment}
-                    </span>
-                    <span className={`text-sm font-medium ${getConfidenceColor(signal.result.confidence)}`}>
-                      {signal.result.confidence} Confidence
-                    </span>
-                  </div>
+      {/* Overall Signal Card */}
+      <div className={`rounded-lg border-2 p-4 sm:p-6 ${getSentimentColor(overallSignal.sentiment)}`}>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4">
+          <div className="flex items-center space-x-3 mb-2 sm:mb-0">
+            <div className="p-2 bg-white bg-opacity-50 rounded-lg">
+              <BarChart3 className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold">Overall Market Sentiment</h3>
+              <div className="flex items-center space-x-2">
+                <span className="text-sm font-medium">{overallSignal.sentiment}</span>
+                <span className={`text-xs ${getConfidenceColor(overallSignal.confidence)}`}>
+                  ({overallSignal.confidence} Confidence)
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p className="text-sm leading-relaxed">{overallSignal.text}</p>
+      </div>
+
+      {/* Individual Signals Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {signals.slice(1).map((signal) => (
+          <div key={signal.id} className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex items-center space-x-2">
+                <div className={`p-2 rounded-lg ${getSentimentColor(signal.sentiment).split(' ')[0]} ${getSentimentColor(signal.sentiment).split(' ')[0].replace('bg-', 'text-').replace('-100', '-600')}`}>
+                  {signal.icon}
+                </div>
+                <h4 className="font-medium text-gray-900 text-sm sm:text-base">{signal.name}</h4>
+              </div>
+              <div className="text-right">
+                <span className={`px-2 py-1 rounded text-xs font-medium ${getSentimentColor(signal.sentiment)}`}>
+                  {signal.sentiment}
+                </span>
+                <div className={`text-xs mt-1 ${getConfidenceColor(signal.confidence)}`}>
+                  {signal.confidence}
                 </div>
               </div>
             </div>
-
-            <p className="text-gray-700 text-sm leading-relaxed mb-4">
-              {signal.result.text}
-            </p>
-
-            {signal.result.divergences && signal.result.divergences.length > 0 && (
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                <div className="flex items-start space-x-2">
-                  <span className="text-yellow-600 text-sm">⚠️</span>
-                  <div className="text-yellow-800 text-sm">
-                    <div className="font-medium mb-1">Divergences:</div>
-                    <ul className="space-y-1">
-                      {signal.result.divergences.map((div, idx) => (
-                        <li key={idx} className="text-xs">• {div}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            )}
+            <p className="text-sm text-gray-600 leading-relaxed">{signal.text}</p>
           </div>
         ))}
       </div>
 
-      <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+      {/* Current Indicators Summary */}
+      <div className="bg-gray-50 rounded-lg p-4 sm:p-6 border border-gray-200">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Current Indicators</h3>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="text-center">
-            <div className="text-2xl font-bold text-gray-900">{yieldCurveSpread.toFixed(2)}%</div>
+            <div className="text-xl sm:text-2xl font-bold text-gray-900">{yieldCurveSpread.toFixed(2)}%</div>
             <div className="text-sm text-gray-600">10Y-2Y Spread</div>
             <div className={`text-xs ${yieldSpreadChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {yieldSpreadChange >= 0 ? '+' : ''}{(yieldSpreadChange * 100).toFixed(0)}bps
+              {formatChange(yieldSpreadChange * 100, 0)}bps
             </div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-gray-900">{fedRate.toFixed(2)}%</div>
+            <div className="text-xl sm:text-2xl font-bold text-gray-900">{fedRate.toFixed(2)}%</div>
             <div className="text-sm text-gray-600">Fed Funds Rate</div>
             <div className={`text-xs ${fedRateChange >= 0 ? 'text-red-600' : 'text-green-600'}`}>
-              {fedRateChange >= 0 ? '+' : ''}{(fedRateChange * 100).toFixed(0)}bps
+              {formatChange(fedRateChange * 100, 0)}bps
             </div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-gray-900">{creditSpreadPct.toFixed(1)}%</div>
+            <div className="text-xl sm:text-2xl font-bold text-gray-900">{creditSpreadPct.toFixed(1)}%</div>
             <div className="text-sm text-gray-600">Credit Spreads</div>
             <div className={`text-xs ${creditSpreadChange >= 0 ? 'text-red-600' : 'text-green-600'}`}>
-              {creditSpreadChange >= 0 ? '+' : ''}{(creditSpreadChange * 100).toFixed(0)}bps
+              {formatChange(creditSpreadChange * 100, 0)}bps
             </div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-gray-900">{vix.toFixed(1)}</div>
+            <div className="text-xl sm:text-2xl font-bold text-gray-900">{vix.toFixed(1)}</div>
             <div className="text-sm text-gray-600">VIX</div>
             <div className={`text-xs ${vixChange >= 0 ? 'text-red-600' : 'text-green-600'}`}>
-              {vixChange >= 0 ? '+' : ''}{vixChange.toFixed(1)}
+              {formatChange(vixChange, 1)}
             </div>
           </div>
         </div>
