@@ -25,8 +25,8 @@ const MarketSignals: React.FC<MarketSignalsProps> = ({ data }) => {
     const twoYear = data.treasuryYields.find(y => y.maturity === '2Y')?.yield || 0;
     const tenYear = data.treasuryYields.find(y => y.maturity === '10Y')?.yield || 0;
     const thirtyYear = data.treasuryYields.find(y => y.maturity === '30Y')?.yield || 0;
-    const tenTwoSpread = data.yieldSpreads.find(s => s.name === '10Y-2Y')?.spread || 0;
-    const thirtyTenSpread = data.yieldSpreads.find(s => s.name === '30Y-10Y')?.spread || 0;
+    const tenTwoSpread = data.yieldSpreads.find(s => s.name === '10Y-2Y')?.value || 0;
+    const thirtyTenSpread = data.yieldSpreads.find(s => s.name === '30Y-10Y')?.value || 0;
     const sp500 = data.marketIndicators.find(i => i.name === 'S&P 500')?.value || 0;
     const vix = data.marketIndicators.find(i => i.name === 'VIX')?.value || 0;
     const dollarIndex = data.marketIndicators.find(i => i.name === 'Dollar Index')?.value || 0;
