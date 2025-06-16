@@ -1,303 +1,436 @@
-import React from 'react';
-import { TrendingUp, TrendingDown, AlertTriangle, Target, BarChart3 } from 'lucide-react';
-import { DashboardData, YieldSpread, CreditSpread } from '../../types/bonds';
+import React, { useMemo } from 'react';
+import { AlertTriangle, TrendingUp, Shield, DollarSign, Target } from 'lucide-react';
+import { DashboardData } from '../../types/bonds';
 
 interface MarketSignalsProps {
   data: DashboardData;
 }
 
-type SignalSentiment = 'Strong Bullish' | 'Bullish' | 'Neutral' | 'Bearish' | 'Strong Bearish';
-type ConfidenceLevel = 'High' | 'Moderate' | 'Low';
-
-interface SignalResult {
-  sentiment: SignalSentiment;
-  confidence: ConfidenceLevel;
-  text: string;
+interface Signal {
+  id: string;
+  name: string;
+  regime: string;
+  confidence: 'High' | 'Moderate' | 'Low';
+  interpretation: string;
+  color: string;
+  bgColor: string;
+  icon: React.ReactNode;
+  metrics: Record<string, number>;
 }
 
 const MarketSignals: React.FC<MarketSignalsProps> = ({ data }) => {
-  // Extract current indicator values
-  const yieldCurveSpread = data.yieldSpreads.find((s: YieldSpread) => s.name === '10Y-2Y Spread')?.value || -0.09;
-  const fedRate = 5.25; // Mock current Fed Funds rate
-  const creditSpread = data.creditSpreads.find((s: CreditSpread) => s.rating === 'IG')?.spread || 150;
-  const creditSpreadPct = creditSpread / 100; // Convert bps to percentage
-  const vix = 18.5; // Mock VIX value
+  
+  // Extract current values from data
+  const currentInputs = useMemo(() => {
+    const twoYear = data.treasuryYields.find(y => y.maturity === '2Y')?.yield || 0;
+    const tenYear = data.treasuryYields.find(y => y.maturity === '10Y')?.yield || 0;
+    const thirtyYear = data.treasuryYields.find(y => y.maturity === '30Y')?.yield || 0;
+    const tenTwoSpread = data.yieldSpreads.find(s => s.name === '10Y-2Y')?.spread || 0;
+    const thirtyTenSpread = data.yieldSpreads.find(s => s.name === '30Y-10Y')?.spread || 0;
+    const sp500 = data.marketIndicators.find(i => i.name === 'S&P 500')?.value || 0;
+    const vix = data.marketIndicators.find(i => i.name === 'VIX')?.value || 0;
+    const dollarIndex = data.marketIndicators.find(i => i.name === 'Dollar Index')?.value || 0;
+    const fedFunds = data.policyRates.find(r => r.name === 'Fed Funds')?.rate || 0;
+    const sofr = data.policyRates.find(r => r.name === 'SOFR')?.rate || 0;
+    const igSpread = (data.creditSpreads.find(s => s.name === 'IG Spread')?.spread || 0) * 100;
+    const hySpread = (data.creditSpreads.find(s => s.name === 'HY Spread')?.spread || 0) * 100;
 
-  // Mock previous values for rate-of-change calculations
-  const prevYieldSpread = yieldCurveSpread + 0.05;
-  const prevFedRate = 5.00;
-  const prevCreditSpread = creditSpreadPct - 0.1;
-  const prevVix = 16.2;
+    return {
+      twoYear, tenYear, thirtyYear, tenTwoSpread, thirtyTenSpread,
+      sp500, vix, dollarIndex, fedFunds, sofr, igSpread, hySpread
+    };
+  }, [data]);
 
-  // Calculate changes with proper precision
-  const formatChange = (change: number, decimals: number = 0): string => {
-    const rounded = parseFloat(change.toFixed(decimals));
-    return rounded >= 0 ? `+${rounded}` : `${rounded}`;
-  };
-
-  const yieldSpreadChange = yieldCurveSpread - prevYieldSpread;
-  const fedRateChange = fedRate - prevFedRate;
-  const creditSpreadChange = creditSpreadPct - prevCreditSpread;
-  const vixChange = vix - prevVix;
-
-  const getSentimentColor = (sentiment: SignalSentiment) => {
-    switch (sentiment) {
-      case 'Strong Bullish': return 'bg-green-100 text-green-800 border-green-300';
-      case 'Bullish': return 'bg-green-50 text-green-700 border-green-200';
-      case 'Neutral': return 'bg-gray-100 text-gray-800 border-gray-300';
-      case 'Bearish': return 'bg-red-50 text-red-700 border-red-200';
-      case 'Strong Bearish': return 'bg-red-100 text-red-800 border-red-300';
-    }
-  };
-
-  const getConfidenceColor = (confidence: ConfidenceLevel) => {
-    switch (confidence) {
-      case 'High': return 'text-green-600';
-      case 'Moderate': return 'text-yellow-600';
-      case 'Low': return 'text-red-600';
-    }
-  };
-
-  // 1. Overall Market Sentiment
-  const calculateOverallSentiment = (): SignalResult => {
-    const yieldSignal = yieldCurveSpread > 0.5 ? 1 : yieldCurveSpread > 0 ? 0 : -1;
-    const fedSignal = fedRate < 3 ? 1 : fedRate < 4 ? 0 : -1;
-    const creditSignal = creditSpreadPct < 1.5 ? 1 : creditSpreadPct < 2.0 ? 0 : -1;
-    const vixSignal = vix < 20 ? 1 : vix < 25 ? 0 : -1;
-
-    const signals = [yieldSignal, fedSignal, creditSignal, vixSignal];
-    const totalScore = signals.reduce((sum, signal) => sum + signal, 0);
-    const avgScore = totalScore / signals.length;
-    const agreement = signals.filter(s => Math.abs(s - avgScore) <= 0.5).length;
-
-    let sentiment: SignalSentiment;
-    if (totalScore >= 3) sentiment = 'Strong Bullish';
-    else if (totalScore >= 1) sentiment = 'Bullish';
-    else if (totalScore >= -1) sentiment = 'Neutral';
-    else if (totalScore >= -3) sentiment = 'Bearish';
-    else sentiment = 'Strong Bearish';
-
-    const confidence: ConfidenceLevel = agreement >= 3 ? 'High' : agreement >= 2 ? 'Moderate' : 'Low';
-
-    let text = `Markets show ${sentiment.toLowerCase()} positioning with ${agreement}/4 indicators aligned. `;
-    text += `Yield curve at ${yieldCurveSpread.toFixed(2)}%, Fed at ${fedRate}%, credit spreads ${creditSpreadPct.toFixed(1)}%, VIX ${vix}.`;
-
-    return { sentiment, confidence, text };
-  };
-
-  // 2. Yield Curve Signal
-  const calculateYieldCurveSignal = (): SignalResult => {
-    let sentiment: SignalSentiment;
-    let text = "";
-
-    if (yieldCurveSpread > 1.0) {
-      sentiment = 'Strong Bullish';
-      text = `Steep yield curve at ${yieldCurveSpread.toFixed(2)}% signals robust growth expectations and healthy economic conditions.`;
-    } else if (yieldCurveSpread > 0.3) {
-      sentiment = 'Bullish';
-      text = `Positive yield curve at ${yieldCurveSpread.toFixed(2)}% maintains constructive economic outlook.`;
-    } else if (yieldCurveSpread > 0) {
-      sentiment = 'Neutral';
-      text = `Flattening curve at ${yieldCurveSpread.toFixed(2)}% suggests moderating growth expectations.`;
-    } else if (yieldCurveSpread > -0.5) {
-      sentiment = 'Bearish';
-      text = `Inverted curve at ${yieldCurveSpread.toFixed(2)}% historically precedes economic slowdowns.`;
-    } else {
-      sentiment = 'Strong Bearish';
-      text = `Deeply inverted curve at ${yieldCurveSpread.toFixed(2)}% indicates significant recession risk.`;
-    }
-
-    const confidence: ConfidenceLevel = Math.abs(yieldSpreadChange) >= 0.1 ? 'High' : 'Moderate';
-
-    return { sentiment, confidence, text };
-  };
-
-  // 3. Financial Conditions
-  const calculateFinancialConditions = (): SignalResult => {
-    let sentiment: SignalSentiment;
-    let text = "";
-
-    if (fedRate < 2 && creditSpreadPct < 1.0) {
-      sentiment = 'Strong Bullish';
-      text = `Financial conditions remain ultra-easy with Fed at ${fedRate}% and credit spreads tight.`;
-    } else if (fedRate <= 3 && creditSpreadPct < 1.5) {
-      sentiment = 'Bullish';
-      text = `Accommodative conditions persist with Fed at ${fedRate}%.`;
-    } else if (fedRate <= 4 && creditSpreadPct < 2.0) {
-      sentiment = 'Neutral';
-      text = `Policy approaching neutral at ${fedRate}% with balanced credit conditions.`;
-    } else if (fedRate > 4 && creditSpreadPct < 2.5) {
-      sentiment = 'Bearish';
-      text = `Fed tightening beginning to bite with rates at ${fedRate}%.`;
-    } else {
-      sentiment = 'Strong Bearish';
-      text = `Restrictive policy at ${fedRate}% creating significant headwinds.`;
-    }
-
-    const confidence: ConfidenceLevel = Math.abs(fedRateChange) >= 0.25 ? 'High' : 'Moderate';
-
-    return { sentiment, confidence, text };
-  };
-
-  // 4. Risk Sentiment
-  const calculateRiskSentiment = (): SignalResult => {
-    let sentiment: SignalSentiment;
-    let text = "";
-
-    if (creditSpreadPct < 1.0 && vix < 15) {
-      sentiment = 'Strong Bullish';
-      text = `Strong risk appetite with VIX at ${vix} and spreads at cycle tights.`;
-    } else if (creditSpreadPct < 1.5 && vix < 20) {
-      sentiment = 'Bullish';
-      text = `Constructive risk sentiment with contained volatility at ${vix}.`;
-    } else if (creditSpreadPct < 2.0 && vix < 25) {
-      sentiment = 'Neutral';
-      text = `Balanced risk positioning with VIX at ${vix}.`;
-    } else if (creditSpreadPct > 2.0 || vix > 25) {
-      sentiment = 'Bearish';
-      text = `Risk-off positioning evident with elevated stress indicators.`;
-    } else {
-      sentiment = 'Strong Bearish';
-      text = `Panic conditions with VIX at ${vix}.`;
-    }
-
-    const confidence: ConfidenceLevel = Math.abs(vixChange) >= 5 ? 'High' : 'Moderate';
-
-    return { sentiment, confidence, text };
-  };
-
-  // 5. Policy Divergence
-  const calculatePolicyDivergence = (): SignalResult => {
-    const realYield = fedRate - 2.5; // Assume 2.5% inflation target
+  // Calculate previous period values for rate of change
+  const previousInputs = useMemo(() => {
+    const twoYear = currentInputs.twoYear - (data.treasuryYields.find(y => y.maturity === '2Y')?.change || 0);
+    const tenYear = currentInputs.tenYear - (data.treasuryYields.find(y => y.maturity === '10Y')?.change || 0);
+    const thirtyYear = currentInputs.thirtyYear - (data.treasuryYields.find(y => y.maturity === '30Y')?.change || 0);
+    const tenTwoSpread = currentInputs.tenTwoSpread - (data.yieldSpreads.find(s => s.name === '10Y-2Y')?.change || 0);
+    const thirtyTenSpread = currentInputs.thirtyTenSpread - (data.yieldSpreads.find(s => s.name === '30Y-10Y')?.change || 0);
     
-    let sentiment: SignalSentiment;
-    let text = "";
+    return { twoYear, tenYear, thirtyYear, tenTwoSpread, thirtyTenSpread };
+  }, [data, currentInputs]);
 
-    if (realYield < -1) {
-      sentiment = 'Strong Bullish';
-      text = `Deeply negative real rates at ${realYield.toFixed(1)}% provide massive monetary stimulus.`;
-    } else if (realYield < 0) {
-      sentiment = 'Bullish';
-      text = `Negative real yields support risk assets and economic activity.`;
-    } else if (realYield < 1) {
-      sentiment = 'Neutral';
-      text = `Modest positive real rates maintain balanced monetary conditions.`;
-    } else if (realYield < 2) {
-      sentiment = 'Bearish';
-      text = `Restrictive real rates beginning to constrain economic activity.`;
+  // Economic Outlook Signal
+  const calculateEconomicOutlook = (): Signal => {
+    const { tenTwoSpread, thirtyTenSpread } = currentInputs;
+    const tenTwoChange = tenTwoSpread - previousInputs.tenTwoSpread;
+    
+    let regime: string, color: string, bgColor: string;
+    let confidence: 'High' | 'Moderate' | 'Low' = 'High';
+    
+    if (tenTwoSpread < -0.5) {
+      regime = 'DEEP RECESSION RISK';
+      color = 'text-red-700';
+      bgColor = 'bg-red-50 border-red-200';
+    } else if (tenTwoSpread < 0) {
+      regime = 'RECESSION RISK';
+      color = 'text-red-600';
+      bgColor = 'bg-red-50 border-red-200';
+    } else if (tenTwoSpread < 0.5) {
+      regime = 'SLOWDOWN WARNING';
+      color = 'text-orange-600';
+      bgColor = 'bg-orange-50 border-orange-200';
+    } else if (tenTwoSpread < 1.5) {
+      regime = 'MODERATE GROWTH';
+      color = 'text-yellow-600';
+      bgColor = 'bg-yellow-50 border-yellow-200';
     } else {
-      sentiment = 'Strong Bearish';
-      text = `Highly restrictive real rates at ${realYield.toFixed(1)}% likely to dampen growth significantly.`;
+      regime = 'STRONG GROWTH';
+      color = 'text-green-600';
+      bgColor = 'bg-green-50 border-green-200';
     }
 
-    const confidence: ConfidenceLevel = Math.abs(fedRateChange) >= 0.5 ? 'High' : 'Moderate';
+    if (Math.abs(tenTwoChange) > 0.2 || (tenTwoSpread > 0 && thirtyTenSpread < 0.2)) {
+      confidence = 'Moderate';
+    }
 
-    return { sentiment, confidence, text };
+    const changeText = tenTwoChange > 0 ? `steepened by ${Math.abs(tenTwoChange * 100).toFixed(0)} bps` : 
+                      tenTwoChange < 0 ? `flattened by ${Math.abs(tenTwoChange * 100).toFixed(0)} bps` : 'remained stable';
+    
+    let interpretation: string;
+    if (regime.includes('RECESSION')) {
+      interpretation = `The 10Y-2Y spread has inverted to ${(tenTwoSpread * 100).toFixed(0)} bps, having ${changeText} recently. Historical patterns show curves this inverted precede recessions by 6-18 months approximately 70% of the time. The 30Y-10Y spread at ${(thirtyTenSpread * 100).toFixed(0)} bps provides additional context on recession duration expectations.`;
+    } else if (regime === 'SLOWDOWN WARNING') {
+      interpretation = `The 10Y-2Y spread has flattened to ${(tenTwoSpread * 100).toFixed(0)} bps, having ${changeText}. This rapid flattening approaching inversion territory suggests bond markets are pricing significant economic deceleration over the next 12 months.`;
+    } else {
+      interpretation = `The yield curve remains positively sloped with 10Y-2Y at ${(tenTwoSpread * 100).toFixed(0)} bps, suggesting continued economic expansion. The curve has ${changeText}, indicating ${tenTwoChange > 0 ? 'improving' : 'moderating'} growth expectations.`;
+    }
+
+    return {
+      id: 'economic-outlook',
+      name: 'Economic Outlook',
+      regime, confidence, interpretation, color, bgColor,
+      icon: <TrendingUp className="w-5 h-5" />,
+      metrics: { tenTwoSpread, thirtyTenSpread, tenTwoChange }
+    };
   };
 
-  const overallSignal = calculateOverallSentiment();
-  const yieldCurveSignal = calculateYieldCurveSignal();
-  const financialConditionsSignal = calculateFinancialConditions();
-  const riskSentimentSignal = calculateRiskSentiment();
-  const policyDivergenceSignal = calculatePolicyDivergence();
+  // Risk Environment Signal
+  const calculateRiskEnvironment = (): Signal => {
+    const { igSpread, hySpread, vix } = currentInputs;
+    
+    let regime: string, color: string, bgColor: string;
+    let confidence: 'High' | 'Moderate' | 'Low' = 'High';
+    
+    if (igSpread > 200 || hySpread > 800 || vix > 35) {
+      regime = 'STRESS';
+      color = 'text-red-700';
+      bgColor = 'bg-red-50 border-red-200';
+    } else if (igSpread > 150 || hySpread > 600 || vix > 25) {
+      regime = 'RISK-OFF';
+      color = 'text-red-600';
+      bgColor = 'bg-red-50 border-red-200';
+    } else if (igSpread > 120 || hySpread > 450 || vix > 20) {
+      regime = 'CAUTIOUS';
+      color = 'text-orange-600';
+      bgColor = 'bg-orange-50 border-orange-200';
+    } else if (igSpread > 80 || hySpread > 300 || vix > 15) {
+      regime = 'BALANCED';
+      color = 'text-yellow-600';
+      bgColor = 'bg-yellow-50 border-yellow-200';
+    } else {
+      regime = 'RISK-ON';
+      color = 'text-green-600';
+      bgColor = 'bg-green-50 border-green-200';
+    }
 
-  const signals = [
-    { id: 'overall', name: 'Overall Market', icon: <BarChart3 className="w-4 h-4" />, ...overallSignal },
-    { id: 'yield-curve', name: 'Yield Curve', icon: <TrendingUp className="w-4 h-4" />, ...yieldCurveSignal },
-    { id: 'financial', name: 'Financial Conditions', icon: <Target className="w-4 h-4" />, ...financialConditionsSignal },
-    { id: 'risk', name: 'Risk Sentiment', icon: <AlertTriangle className="w-4 h-4" />, ...riskSentimentSignal },
-    { id: 'policy', name: 'Policy Stance', icon: <TrendingDown className="w-4 h-4" />, ...policyDivergenceSignal }
-  ];
+    const creditStress = (igSpread > 120 || hySpread > 450);
+    const equityStress = vix > 20;
+    if (creditStress !== equityStress) confidence = 'Moderate';
+
+    let interpretation: string;
+    if (regime === 'STRESS' || regime === 'RISK-OFF') {
+      interpretation = `Risk aversion building as credit spreads widen to ${igSpread.toFixed(0)}/${hySpread.toFixed(0)} bps (IG/HY) with VIX elevated at ${vix.toFixed(1)}. Credit markets are demanding higher compensation for risk, signaling deteriorating conditions.`;
+    } else if (regime === 'RISK-ON') {
+      interpretation = `Credit markets remain calm with IG spreads at ${igSpread.toFixed(0)} bps and HY at ${hySpread.toFixed(0)} bps. VIX at ${vix.toFixed(1)} confirms low volatility environment supporting risk assets.`;
+    } else {
+      interpretation = `Mixed risk signals with credit spreads at ${igSpread.toFixed(0)}/${hySpread.toFixed(0)} bps and VIX at ${vix.toFixed(1)}. Markets showing cautious but not stressed conditions.`;
+    }
+
+    return {
+      id: 'risk-environment',
+      name: 'Risk Environment',
+      regime, confidence, interpretation, color, bgColor,
+      icon: <Shield className="w-5 h-5" />,
+      metrics: { igSpread, hySpread, vix }
+    };
+  };
+
+  // Policy & Rates Direction Signal
+  const calculatePolicyDirection = (): Signal => {
+    const { twoYear, fedFunds, sofr } = currentInputs;
+    const policyGap = twoYear - fedFunds;
+    
+    let regime: string, color: string, bgColor: string;
+    let confidence: 'High' | 'Moderate' | 'Low' = 'High';
+    
+    if (policyGap < -0.5) {
+      regime = 'AGGRESSIVE EASING EXPECTED';
+      color = 'text-blue-700';
+      bgColor = 'bg-blue-50 border-blue-200';
+    } else if (policyGap < 0) {
+      regime = 'CUTS PRICED';
+      color = 'text-blue-600';
+      bgColor = 'bg-blue-50 border-blue-200';
+    } else if (Math.abs(policyGap) <= 0.25) {
+      regime = 'NEUTRAL';
+      color = 'text-gray-600';
+      bgColor = 'bg-gray-50 border-gray-200';
+    } else if (policyGap > 0.5) {
+      regime = 'AGGRESSIVE TIGHTENING EXPECTED';
+      color = 'text-red-600';
+      bgColor = 'bg-red-50 border-red-200';
+    } else {
+      regime = 'HIKES PRICED';
+      color = 'text-orange-600';
+      bgColor = 'bg-orange-50 border-orange-200';
+    }
+
+    const fundingSpread = Math.abs(sofr - fedFunds);
+    if (fundingSpread > 0.1) confidence = 'Moderate';
+
+    const cutsOrHikes = policyGap < 0 ? 'cuts' : 'hikes';
+    const bpsExpected = Math.abs(policyGap * 100).toFixed(0);
+    
+    let interpretation: string;
+    if (Math.abs(policyGap) > 0.25) {
+      interpretation = `Markets pricing ${bpsExpected} bps of ${cutsOrHikes} with 2Y yields at ${twoYear.toFixed(2)}% vs Fed Funds at ${fedFunds.toFixed(2)}%. This ${Math.abs(policyGap * 100).toFixed(0)} bp gap indicates markets expect significant policy changes over the next 12 months.`;
+    } else {
+      interpretation = `2Y yields at ${twoYear.toFixed(2)}% closely aligned with Fed Funds at ${fedFunds.toFixed(2)}%, suggesting markets agree with current policy stance. Limited policy changes expected near-term.`;
+    }
+
+    return {
+      id: 'policy-direction',
+      name: 'Policy & Rates Direction',
+      regime, confidence, interpretation, color, bgColor,
+      icon: <Target className="w-5 h-5" />,
+      metrics: { twoYear, fedFunds, policyGap, sofr }
+    };
+  };
+
+  // Bond Market Stress Signal
+  const calculateBondStress = (): Signal => {
+    const { tenTwoSpread, igSpread, vix, sofr, fedFunds } = currentInputs;
+    
+    let redFlags = 0;
+    const flags: string[] = [];
+    
+    if (tenTwoSpread < -0.5) { redFlags++; flags.push('Deep curve inversion'); }
+    if (igSpread > 150) { redFlags++; flags.push('IG spreads widening'); }
+    if (vix > 30) { redFlags++; flags.push('Elevated volatility'); }
+    if (Math.abs(sofr - fedFunds) > 0.1) { redFlags++; flags.push('Funding stress'); }
+    
+    let regime: string, color: string, bgColor: string;
+    const confidence: 'High' | 'Moderate' | 'Low' = 'High';
+    
+    if (redFlags >= 5) {
+      regime = 'CRISIS';
+      color = 'text-red-800';
+      bgColor = 'bg-red-100 border-red-300';
+    } else if (redFlags >= 3) {
+      regime = 'STRESS';
+      color = 'text-red-600';
+      bgColor = 'bg-red-50 border-red-200';
+    } else if (redFlags >= 2) {
+      regime = 'WARNING';
+      color = 'text-orange-600';
+      bgColor = 'bg-orange-50 border-orange-200';
+    } else if (redFlags === 1) {
+      regime = 'MONITORING';
+      color = 'text-yellow-600';
+      bgColor = 'bg-yellow-50 border-yellow-200';
+    } else {
+      regime = 'NORMAL';
+      color = 'text-green-600';
+      bgColor = 'bg-green-50 border-green-200';
+    }
+
+    let interpretation: string;
+    if (redFlags === 0) {
+      interpretation = `Bond market functioning normally with no stress indicators. All key metrics within normal ranges supporting healthy fixed income conditions.`;
+    } else if (redFlags <= 2) {
+      interpretation = `Warning signs emerging: ${flags.join(', ')}. While not yet critical, these ${redFlags} indicator${redFlags > 1 ? 's' : ''} warrant monitoring for potential bond market stress.`;
+    } else {
+      interpretation = `Multiple stress indicators suggest bond market dysfunction risk: ${flags.join(', ')}. ${redFlags} red flags indicate heightened probability of fixed income market disruption.`;
+    }
+
+    return {
+      id: 'bond-stress',
+      name: 'Bond Market Stress',
+      regime, confidence, interpretation, color, bgColor,
+      icon: <AlertTriangle className="w-5 h-5" />,
+      metrics: { redFlags, tenTwoSpread, igSpread, vix }
+    };
+  };
+
+  // Inflation Expectations Signal
+  const calculateInflationExpectations = (): Signal => {
+    const { tenYear, thirtyYear, fedFunds } = currentInputs;
+    
+    let regime: string, color: string, bgColor: string;
+    let confidence: 'High' | 'Moderate' | 'Low' = 'High';
+    
+    if (tenYear < 2 && thirtyYear < 2.5) {
+      regime = 'DEFLATION RISK';
+      color = 'text-purple-700';
+      bgColor = 'bg-purple-50 border-purple-200';
+    } else if (tenYear < 3 && thirtyYear < 3.5) {
+      regime = 'LOW INFLATION';
+      color = 'text-blue-600';
+      bgColor = 'bg-blue-50 border-blue-200';
+    } else if (tenYear < 4.5 && thirtyYear < 5) {
+      regime = 'NORMAL';
+      color = 'text-green-600';
+      bgColor = 'bg-green-50 border-green-200';
+    } else if (tenYear < 5.5 && thirtyYear < 6) {
+      regime = 'ELEVATED';
+      color = 'text-orange-600';
+      bgColor = 'bg-orange-50 border-orange-200';
+    } else {
+      regime = 'HIGH INFLATION';
+      color = 'text-red-600';
+      bgColor = 'bg-red-50 border-red-200';
+    }
+
+    const realRate = tenYear - 2.5;
+    if (realRate < 0) confidence = 'Moderate';
+
+    let interpretation: string;
+    if (regime === 'HIGH INFLATION' || regime === 'ELEVATED') {
+      interpretation = `10Y yields at ${tenYear.toFixed(2)}% and 30Y at ${thirtyYear.toFixed(2)}% suggest elevated inflation expectations. Despite Fed at ${fedFunds.toFixed(2)}%, long yields indicate inflation concerns persist with real rates at ${realRate.toFixed(1)}%.`;
+    } else if (regime === 'DEFLATION RISK' || regime === 'LOW INFLATION') {
+      interpretation = `Long yields at ${tenYear.toFixed(2)}%/${thirtyYear.toFixed(2)}% (10Y/30Y) imply low inflation expectations well below Fed's 2% target. Real rates appear elevated, suggesting disinflationary pressures.`;
+    } else {
+      interpretation = `10Y yields at ${tenYear.toFixed(2)}% imply moderate inflation expectations around Fed's target. 30Y at ${thirtyYear.toFixed(2)}% confirms stable long-term inflation outlook with real rates at ${realRate.toFixed(1)}%.`;
+    }
+
+    return {
+      id: 'inflation-expectations',
+      name: 'Inflation Expectations',
+      regime, confidence, interpretation, color, bgColor,
+      icon: <DollarSign className="w-5 h-5" />,
+      metrics: { tenYear, thirtyYear, realRate }
+    };
+  };
+
+  // Calculate all signals
+  const signals: Signal[] = useMemo(() => [
+    calculateEconomicOutlook(),
+    calculateRiskEnvironment(),
+    calculatePolicyDirection(),
+    calculateBondStress(),
+    calculateInflationExpectations()
+  ], [currentInputs, previousInputs]);
+
+  // Confidence indicator component
+  const getConfidenceIndicator = (confidence: string) => {
+    switch (confidence) {
+      case 'High':
+        return <div className="flex space-x-1">
+          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+        </div>;
+      case 'Moderate':
+        return <div className="flex space-x-1">
+          <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+          <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+          <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+        </div>;
+      case 'Low':
+        return <div className="flex space-x-1">
+          <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+          <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+          <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+        </div>;
+      default:
+        return null;
+    }
+  };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="text-center">
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Market Signals Analysis</h2>
-        <p className="text-sm text-gray-600">Real-time interpretation of key market indicators</p>
-      </div>
-
-      {/* Overall Signal Card */}
-      <div className={`rounded-lg border-2 p-4 sm:p-6 ${getSentimentColor(overallSignal.sentiment)}`}>
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4">
-          <div className="flex items-center space-x-3 mb-2 sm:mb-0">
-            <div className="p-2 bg-white bg-opacity-50 rounded-lg">
-              <BarChart3 className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold">Overall Market Sentiment</h3>
-              <div className="flex items-center space-x-2">
-                <span className="text-sm font-medium">{overallSignal.sentiment}</span>
-                <span className={`text-xs ${getConfidenceColor(overallSignal.confidence)}`}>
-                  ({overallSignal.confidence} Confidence)
-                </span>
-              </div>
-            </div>
-          </div>
+    <section className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold text-gray-900">Market Signals Intelligence</h2>
+        <div className="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+          Based on 12 FRED Metrics • Real-time Analysis
         </div>
-        <p className="text-sm leading-relaxed">{overallSignal.text}</p>
       </div>
 
-      {/* Individual Signals Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {signals.slice(1).map((signal) => (
-          <div key={signal.id} className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex items-center space-x-2">
-                <div className={`p-2 rounded-lg ${getSentimentColor(signal.sentiment).split(' ')[0]} ${getSentimentColor(signal.sentiment).split(' ')[0].replace('bg-', 'text-').replace('-100', '-600')}`}>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {signals.map((signal) => (
+          <div key={signal.id} className={`${signal.bgColor} border rounded-lg p-6 transition-all duration-200 hover:shadow-md`}>
+            {/* Signal Header */}
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center space-x-3">
+                <div className={`p-2 rounded-lg ${signal.color.replace('text-', 'bg-').replace('-600', '-100')} ${signal.color}`}>
                   {signal.icon}
                 </div>
-                <h4 className="font-medium text-gray-900 text-sm sm:text-base">{signal.name}</h4>
+                <div>
+                  <h3 className="font-semibold text-gray-900">{signal.name}</h3>
+                  <div className="flex items-center space-x-2 mt-1">
+                    <span className={`text-sm font-medium ${signal.color}`}>
+                      {signal.regime}
+                    </span>
+                  </div>
+                </div>
               </div>
+              
+              {/* Confidence Indicator */}
               <div className="text-right">
-                <span className={`px-2 py-1 rounded text-xs font-medium ${getSentimentColor(signal.sentiment)}`}>
-                  {signal.sentiment}
-                </span>
-                <div className={`text-xs mt-1 ${getConfidenceColor(signal.confidence)}`}>
-                  {signal.confidence}
+                <div className="text-xs text-gray-500 mb-1">Confidence</div>
+                <div className="flex items-center space-x-2">
+                  {getConfidenceIndicator(signal.confidence)}
+                  <span className="text-xs text-gray-600">{signal.confidence}</span>
                 </div>
               </div>
             </div>
-            <p className="text-sm text-gray-600 leading-relaxed">{signal.text}</p>
+
+            {/* Interpretation Text */}
+            <div className="text-sm text-gray-700 leading-relaxed">
+              {signal.interpretation}
+            </div>
+
+            {/* Key Metrics Display */}
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <div className="text-xs text-gray-500 mb-2">Key Metrics:</div>
+              <div className="flex flex-wrap gap-3 text-xs">
+                {Object.entries(signal.metrics).map(([key, value]) => (
+                  <div key={key} className="bg-white bg-opacity-50 px-2 py-1 rounded">
+                    <span className="text-gray-600">{key}:</span>
+                    <span className="font-medium ml-1">
+                      {typeof value === 'number' ? 
+                        (key.includes('Spread') || key.includes('Gap') ? 
+                          `${(value * 100).toFixed(0)}bps` : 
+                          value.toFixed(2)
+                        ) : 
+                        value
+                      }
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         ))}
       </div>
 
-      {/* Current Indicators Summary */}
-      <div className="bg-gray-50 rounded-lg p-4 sm:p-6 border border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Current Indicators</h3>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="text-center">
-            <div className="text-xl sm:text-2xl font-bold text-gray-900">{yieldCurveSpread.toFixed(2)}%</div>
-            <div className="text-sm text-gray-600">10Y-2Y Spread</div>
-            <div className={`text-xs ${yieldSpreadChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {formatChange(yieldSpreadChange * 100, 0)}bps
+      {/* Summary Footer */}
+      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+        <div className="flex items-center space-x-2 mb-2">
+          <AlertTriangle className="w-4 h-4 text-gray-600" />
+          <span className="text-sm font-medium text-gray-900">Signal Summary</span>
             </div>
-          </div>
-          <div className="text-center">
-            <div className="text-xl sm:text-2xl font-bold text-gray-900">{fedRate.toFixed(2)}%</div>
-            <div className="text-sm text-gray-600">Fed Funds Rate</div>
-            <div className={`text-xs ${fedRateChange >= 0 ? 'text-red-600' : 'text-green-600'}`}>
-              {formatChange(fedRateChange * 100, 0)}bps
-            </div>
-          </div>
-          <div className="text-center">
-            <div className="text-xl sm:text-2xl font-bold text-gray-900">{creditSpreadPct.toFixed(1)}%</div>
-            <div className="text-sm text-gray-600">Credit Spreads</div>
-            <div className={`text-xs ${creditSpreadChange >= 0 ? 'text-red-600' : 'text-green-600'}`}>
-              {formatChange(creditSpreadChange * 100, 0)}bps
-            </div>
-          </div>
-          <div className="text-center">
-            <div className="text-xl sm:text-2xl font-bold text-gray-900">{vix.toFixed(1)}</div>
-            <div className="text-sm text-gray-600">VIX</div>
-            <div className={`text-xs ${vixChange >= 0 ? 'text-red-600' : 'text-green-600'}`}>
-              {formatChange(vixChange, 1)}
-            </div>
-          </div>
+        <div className="text-sm text-gray-600">
+          {signals.filter(s => s.regime.includes('RISK') || s.regime.includes('STRESS') || s.regime.includes('WARNING')).length > 0 ? 
+            `${signals.filter(s => s.regime.includes('RISK') || s.regime.includes('STRESS') || s.regime.includes('WARNING')).length} warning signal(s) detected. Monitor for potential market stress.` :
+            'All signals within normal ranges. Market conditions appear stable.'
+          }
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

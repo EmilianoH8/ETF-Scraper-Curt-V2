@@ -4,250 +4,262 @@ const Guide: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Market Signals Interpretation Guide</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-6">How to Read Market Signals</h1>
         
         <div className="prose prose-lg max-w-none">
-          <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">Overview</h2>
-          <p className="text-gray-700 mb-6">
-            This guide explains how to interpret the four key market indicators and their movements to generate accurate market signals.
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-            {/* Yield Curve Section */}
-            <div className="bg-blue-50 rounded-lg p-6 border border-blue-200">
-              <h3 className="text-xl font-semibold text-blue-900 mb-4 flex items-center">
-                <span className="mr-2">📈</span>
-                1. Yield Curve (10Y-2Y Spread)
-              </h3>
-              
-              <h4 className="font-semibold text-gray-900 mb-2">What it measures</h4>
-              <p className="text-gray-700 mb-4">
-                The difference between 10-year and 2-year Treasury yields. A key predictor of economic growth and recession risk.
-              </p>
-
-              <h4 className="font-semibold text-gray-900 mb-2">Interpretation</h4>
-              <ul className="text-sm text-gray-700 space-y-1 mb-4">
-                <li><strong className="text-green-700">Positive spread (&gt;0)</strong>: Normal curve - healthy growth expectations</li>
-                <li><strong className="text-yellow-700">Near zero (0 to 0.5)</strong>: Flattening curve - slowing growth</li>
-                <li><strong className="text-red-700">Negative spread (&lt;0)</strong>: Inverted curve - recession risk within 12-18 months</li>
-              </ul>
-
-              <h4 className="font-semibold text-gray-900 mb-2">Movement Analysis</h4>
-              <ul className="text-sm text-gray-700 space-y-1">
-                <li><strong>Steepening (+0.10+)</strong>: Recovery expectations or inflation concerns</li>
-                <li><strong>Flattening (-0.10+)</strong>: Growth concerns, Fed tightening expectations</li>
-                <li><strong>Small moves (±0.05)</strong>: Normal market fluctuations</li>
-              </ul>
-            </div>
-
-            {/* Fed Policy Section */}
-            <div className="bg-purple-50 rounded-lg p-6 border border-purple-200">
-              <h3 className="text-xl font-semibold text-purple-900 mb-4 flex items-center">
-                <span className="mr-2">🏦</span>
-                2. Fed Policy Stance (Fed Funds Rate)
-              </h3>
-              
-              <h4 className="font-semibold text-gray-900 mb-2">What it measures</h4>
-              <p className="text-gray-700 mb-4">
-                The current Federal Funds rate, indicating monetary policy stance.
-              </p>
-
-              <h4 className="font-semibold text-gray-900 mb-2">Interpretation</h4>
-              <ul className="text-sm text-gray-700 space-y-1 mb-4">
-                <li><strong className="text-green-700">Low rates (&lt;2%)</strong>: Accommodative policy, supporting growth</li>
-                <li><strong className="text-blue-700">Neutral rates (2-3%)</strong>: Balanced policy</li>
-                <li><strong className="text-orange-700">High rates (&gt;4%)</strong>: Restrictive policy, fighting inflation</li>
-                <li><strong className="text-red-700">Very high rates (&gt;5%)</strong>: Aggressive tightening</li>
-              </ul>
-
-              <h4 className="font-semibold text-gray-900 mb-2">Movement Analysis</h4>
-              <ul className="text-sm text-gray-700 space-y-1">
-                <li><strong>Rate hikes (+0.25+)</strong>: Tightening cycle, inflation concerns</li>
-                <li><strong>Rate cuts (-0.25+)</strong>: Easing cycle, growth concerns</li>
-                <li><strong>Unchanged</strong>: Policy on hold, watching data</li>
-              </ul>
-            </div>
-
-            {/* Credit Risk Section */}
-            <div className="bg-orange-50 rounded-lg p-6 border border-orange-200">
-              <h3 className="text-xl font-semibold text-orange-900 mb-4 flex items-center">
-                <span className="mr-2">💳</span>
-                3. Credit Risk (Credit Spread Index)
-              </h3>
-              
-              <h4 className="font-semibold text-gray-900 mb-2">What it measures</h4>
-              <p className="text-gray-700 mb-4">
-                The spread between corporate bonds and risk-free Treasuries. Indicates market stress and default risk.
-              </p>
-
-              <h4 className="font-semibold text-gray-900 mb-2">Interpretation</h4>
-              <ul className="text-sm text-gray-700 space-y-1 mb-4">
-                <li><strong className="text-green-700">Tight spreads (&lt;1.0)</strong>: Low credit stress, risk-on environment</li>
-                <li><strong className="text-blue-700">Normal spreads (1.0-2.0)</strong>: Balanced conditions</li>
-                <li><strong className="text-orange-700">Wide spreads (2.0-3.0)</strong>: Elevated credit concerns</li>
-                <li><strong className="text-red-700">Very wide spreads (&gt;3.0)</strong>: Significant stress, possible crisis</li>
-              </ul>
-
-              <h4 className="font-semibold text-gray-900 mb-2">Movement Analysis</h4>
-              <ul className="text-sm text-gray-700 space-y-1">
-                <li><strong>Tightening (-0.10+)</strong>: Improving conditions, risk appetite increasing</li>
-                <li><strong>Widening (+0.10+)</strong>: Credit stress building, risk-off sentiment</li>
-              </ul>
-            </div>
-
-            {/* Market Volatility Section */}
-            <div className="bg-red-50 rounded-lg p-6 border border-red-200">
-              <h3 className="text-xl font-semibold text-red-900 mb-4 flex items-center">
-                <span className="mr-2">⚡</span>
-                4. Market Volatility (VIX)
-              </h3>
-              
-              <h4 className="font-semibold text-gray-900 mb-2">What it measures</h4>
-              <p className="text-gray-700 mb-4">
-                Expected 30-day volatility in the S&P 500. Known as the "fear gauge."
-              </p>
-
-              <h4 className="font-semibold text-gray-900 mb-2">Interpretation</h4>
-              <ul className="text-sm text-gray-700 space-y-1 mb-4">
-                <li><strong className="text-green-700">Low VIX (&lt;15)</strong>: Complacency, low fear</li>
-                <li><strong className="text-blue-700">Normal VIX (15-20)</strong>: Balanced market</li>
-                <li><strong className="text-orange-700">Elevated VIX (20-30)</strong>: Increased uncertainty</li>
-                <li><strong className="text-red-700">High VIX (&gt;30)</strong>: Significant fear/stress</li>
-                <li><strong className="text-red-800">Extreme VIX (&gt;40)</strong>: Panic conditions</li>
-              </ul>
-
-              <h4 className="font-semibold text-gray-900 mb-2">Movement Analysis</h4>
-              <ul className="text-sm text-gray-700 space-y-1">
-                <li><strong>Spike up (+5+)</strong>: Immediate stress event, risk-off move</li>
-                <li><strong>Drift higher (+2-5)</strong>: Building uncertainty, caution warranted</li>
-                <li><strong>Decline (-5+)</strong>: Calming conditions, risk appetite returning</li>
-              </ul>
-            </div>
+          {/* Introduction */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">Understanding Your Bond Dashboard</h2>
+            <p className="text-gray-700 mb-4">
+              This dashboard transforms 12 key bond market metrics into 5 clear signals that help you understand what's happening in fixed income markets and the broader economy. Think of it as your bond market translator – taking complex data and making it actionable.
+            </p>
           </div>
 
-          {/* Signal Interpretation Rules */}
-          <div className="bg-gray-50 rounded-lg p-6 border border-gray-200 mb-8">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">Signal Interpretation Rules</h2>
+          {/* The 12 Market Metrics */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">The 12 Market Metrics</h2>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">1. Convergence Analysis</h3>
-                <p className="text-gray-700 mb-2">When multiple indicators align:</p>
-                <ul className="text-sm text-gray-700 space-y-1">
-                  <li><strong className="text-green-700">All bullish</strong>: Strong risk-on signal</li>
-                  <li><strong className="text-red-700">All bearish</strong>: Strong risk-off signal</li>
-                  <li><strong className="text-yellow-700">Mixed</strong>: Requires nuanced interpretation</li>
-                </ul>
+            {/* Treasury Yields */}
+            <div className="mb-6 bg-blue-50 rounded-lg p-6 border border-blue-200">
+              <h3 className="text-xl font-semibold text-blue-900 mb-4">Treasury Yields</h3>
+              <p className="text-gray-700 mb-3"><strong>2-Year, 10-Year, and 30-Year Treasury Yields</strong></p>
+              <p className="text-gray-700 mb-4">These are the interest rates the U.S. government pays to borrow money for different time periods.</p>
+              
+              <ul className="text-sm text-gray-700 space-y-2 mb-4">
+                <li><strong>2-Year:</strong> Reflects near-term Fed policy expectations</li>
+                <li><strong>10-Year:</strong> The benchmark rate that influences mortgages and corporate borrowing</li>
+                <li><strong>30-Year:</strong> Shows long-term economic and inflation expectations</li>
+              </ul>
+              
+              <div className="bg-white rounded p-3 text-sm">
+                <p className="text-gray-700">
+                  <strong>Higher yields</strong> = Stronger growth or inflation expectations<br/>
+                  <strong>Lower yields</strong> = Economic concerns or flight to safety
+                </p>
               </div>
+            </div>
 
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">2. Divergence Warnings</h3>
-                <p className="text-gray-700 mb-2">When indicators conflict:</p>
-                <ul className="text-sm text-gray-700 space-y-1">
-                  <li><strong>Yield curve bullish + Credit spreads widening</strong>: Credit markets see risks</li>
-                  <li><strong>VIX low + Credit spreads wide</strong>: Equity complacency vs bond caution</li>
-                  <li><strong>Fed easing + VIX rising</strong>: Policy response to emerging stress</li>
-                </ul>
+            {/* Yield Curve Spreads */}
+            <div className="mb-6 bg-purple-50 rounded-lg p-6 border border-purple-200">
+              <h3 className="text-xl font-semibold text-purple-900 mb-4">Yield Curve Spreads</h3>
+              <p className="text-gray-700 mb-3"><strong>10Y-2Y Spread and 30Y-10Y Spread</strong></p>
+              <p className="text-gray-700 mb-4">These measure the difference between long and short-term rates.</p>
+              
+              <ul className="text-sm text-gray-700 space-y-2 mb-4">
+                <li><strong>Positive spread:</strong> Normal - investors demand more yield for longer-term loans</li>
+                <li><strong>Near zero:</strong> Uncertainty about the future</li>
+                <li><strong>Negative (inverted):</strong> Warning sign - often precedes recessions</li>
+              </ul>
+              
+              <div className="bg-white rounded p-3 text-sm">
+                <p className="text-gray-700">
+                  <strong>The shape of the yield curve is one of the most reliable economic predictors.</strong>
+                </p>
               </div>
+            </div>
 
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">3. Magnitude Matters</h3>
-                <ul className="text-sm text-gray-700 space-y-1">
-                  <li>Small moves: Look for confirmation from others</li>
-                  <li>Large moves: Can override mixed signals</li>
-                  <li>Extreme readings: Often mark turning points</li>
-                </ul>
+            {/* Market Context Indicators */}
+            <div className="mb-6 bg-green-50 rounded-lg p-6 border border-green-200">
+              <h3 className="text-xl font-semibold text-green-900 mb-4">Market Context Indicators</h3>
+              <p className="text-gray-700 mb-3"><strong>S&P 500, VIX, and Dollar Index</strong></p>
+              <p className="text-gray-700 mb-4">These provide crucial context for understanding bond movements:</p>
+              
+              <ul className="text-sm text-gray-700 space-y-2">
+                <li><strong>S&P 500:</strong> When stocks fall, bonds often rally (flight to safety)</li>
+                <li><strong>VIX:</strong> The "fear gauge" - high VIX often means bond buying</li>
+                <li><strong>Dollar Index:</strong> Strong dollar attracts foreign investment to U.S. bonds</li>
+              </ul>
+            </div>
+
+            {/* Policy Rates */}
+            <div className="mb-6 bg-orange-50 rounded-lg p-6 border border-orange-200">
+              <h3 className="text-xl font-semibold text-orange-900 mb-4">Policy Rates</h3>
+              <p className="text-gray-700 mb-3"><strong>Fed Funds Rate and SOFR</strong></p>
+              <p className="text-gray-700 mb-4">These are the short-term rates that anchor the entire rate structure:</p>
+              
+              <ul className="text-sm text-gray-700 space-y-2 mb-4">
+                <li><strong>Fed Funds:</strong> The Federal Reserve's main policy tool</li>
+                <li><strong>SOFR:</strong> The market-based funding rate</li>
+              </ul>
+              
+              <div className="bg-white rounded p-3 text-sm">
+                <p className="text-gray-700">
+                  <strong>When these rise, all rates tend to follow.</strong>
+                </p>
               </div>
+            </div>
 
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">4. Timeframe Considerations</h3>
-                <ul className="text-sm text-gray-700 space-y-1">
-                  <li><strong>Yield Curve</strong>: Leads by 12-18 months</li>
-                  <li><strong>Credit Spreads</strong>: 3-6 month indicator</li>
-                  <li><strong>VIX</strong>: Real-time to 30-day forward</li>
-                  <li><strong>Fed Policy</strong>: Current with 6-12 month impact lag</li>
-                </ul>
+            {/* Credit Spreads */}
+            <div className="mb-6 bg-red-50 rounded-lg p-6 border border-red-200">
+              <h3 className="text-xl font-semibold text-red-900 mb-4">Credit Spreads</h3>
+              <p className="text-gray-700 mb-3"><strong>Investment Grade (IG) and High Yield (HY) Spreads</strong></p>
+              <p className="text-gray-700 mb-4">These measure the extra yield investors demand for corporate bonds over Treasuries:</p>
+              
+              <ul className="text-sm text-gray-700 space-y-2 mb-4">
+                <li><strong>Tight spreads:</strong> Confidence in corporate health</li>
+                <li><strong>Wide spreads:</strong> Concern about defaults and economic stress</li>
+              </ul>
+              
+              <div className="bg-white rounded p-3 text-sm">
+                <p className="text-gray-700">
+                  <strong>Credit spreads often lead other indicators in signaling problems.</strong>
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Market Signal Categories */}
-          <div className="bg-blue-50 rounded-lg p-6 border border-blue-200 mb-8">
-            <h2 className="text-2xl font-semibold text-blue-900 mb-4">Market Signal Categories</h2>
+          {/* The 5 Market Signals */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">The 5 Market Signals</h2>
             
             <div className="space-y-6">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">📊 Overall Market Sentiment</h3>
-                <p className="text-gray-700 text-sm">
-                  Synthesizes all four indicators into a single market view, weighted by extremity and agreement.
-                </p>
+              {/* Economic Outlook */}
+              <div className="bg-blue-50 rounded-lg p-6 border border-blue-200">
+                <h3 className="text-xl font-semibold text-blue-900 mb-3">1. Economic Outlook</h3>
+                <p className="text-gray-700 mb-2"><strong>What it tells you:</strong> What bond markets expect for economic growth</p>
+                <p className="text-gray-700 mb-2"><strong>Based on:</strong> All yield curve metrics</p>
+                <p className="text-gray-700 mb-4"><strong>Time horizon:</strong> 6-18 months ahead</p>
+                
+                <ul className="text-sm text-gray-700 space-y-1">
+                  <li><strong className="text-green-700">Strong Growth:</strong> Steep yield curve, optimistic outlook</li>
+                  <li><strong className="text-blue-700">Moderate Growth:</strong> Normal curve, steady expansion expected</li>
+                  <li><strong className="text-yellow-700">Slowdown:</strong> Flattening curve, growth concerns emerging</li>
+                  <li><strong className="text-red-700">Recession Risk:</strong> Inverted curve, significant downturn expected</li>
+                </ul>
               </div>
 
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">📈 Growth vs Recession Signal</h3>
-                <p className="text-gray-700 text-sm">
-                  Assesses economic growth trajectory and recession probability (6-18 months forward). 
-                  Primary inputs: Yield Curve + Fed Policy.
-                </p>
+              {/* Risk Environment */}
+              <div className="bg-orange-50 rounded-lg p-6 border border-orange-200">
+                <h3 className="text-xl font-semibold text-orange-900 mb-3">2. Risk Environment</h3>
+                <p className="text-gray-700 mb-2"><strong>What it tells you:</strong> How stressed or calm markets are</p>
+                <p className="text-gray-700 mb-2"><strong>Based on:</strong> Credit spreads, VIX, and stock market</p>
+                <p className="text-gray-700 mb-4"><strong>Time horizon:</strong> Current conditions to 3 months</p>
+                
+                <ul className="text-sm text-gray-700 space-y-1">
+                  <li><strong className="text-green-700">Risk-On:</strong> Tight spreads, low volatility, calm markets</li>
+                  <li><strong className="text-blue-700">Balanced:</strong> Normal stress levels</li>
+                  <li><strong className="text-yellow-700">Cautious:</strong> Spreads widening, volatility rising</li>
+                  <li><strong className="text-red-700">Risk-Off:</strong> High stress, flight to quality</li>
+                </ul>
               </div>
 
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">🏦 Financial Conditions</h3>
-                <p className="text-gray-700 text-sm">
-                  Evaluates if monetary policy and credit markets are supporting or restricting growth. 
-                  Primary inputs: Fed Policy + Credit Risk.
-                </p>
+              {/* Policy & Rates Direction */}
+              <div className="bg-purple-50 rounded-lg p-6 border border-purple-200">
+                <h3 className="text-xl font-semibold text-purple-900 mb-3">3. Policy & Rates Direction</h3>
+                <p className="text-gray-700 mb-2"><strong>What it tells you:</strong> Where interest rates are headed</p>
+                <p className="text-gray-700 mb-2"><strong>Based on:</strong> Fed Funds, SOFR, 2Y and 10Y yields</p>
+                <p className="text-gray-700 mb-4"><strong>Time horizon:</strong> 3-12 months</p>
+                
+                <ul className="text-sm text-gray-700 space-y-1">
+                  <li><strong className="text-blue-700">Easing Expected:</strong> Market pricing in rate cuts</li>
+                  <li><strong className="text-gray-700">Neutral:</strong> Rates expected to stay steady</li>
+                  <li><strong className="text-red-700">Tightening Expected:</strong> Rate hikes anticipated</li>
+                </ul>
+                
+                <div className="bg-white rounded p-3 text-sm mt-3">
+                  <p className="text-gray-700">
+                    <strong>The gap between 2Y yields and Fed Funds shows what the market expects the Fed to do.</strong>
+                  </p>
+                </div>
               </div>
 
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">⚡ Risk Sentiment</h3>
-                <p className="text-gray-700 text-sm">
-                  Gauges current investor risk appetite and positioning (real-time to 1 month). 
-                  Primary inputs: Credit Risk + Market Volatility.
-                </p>
+              {/* Bond Market Stress */}
+              <div className="bg-red-50 rounded-lg p-6 border border-red-200">
+                <h3 className="text-xl font-semibold text-red-900 mb-3">4. Bond Market Stress</h3>
+                <p className="text-gray-700 mb-2"><strong>What it tells you:</strong> Whether bond markets are functioning normally</p>
+                <p className="text-gray-700 mb-2"><strong>Based on:</strong> Extreme readings across multiple indicators</p>
+                <p className="text-gray-700 mb-4"><strong>Time horizon:</strong> Immediate</p>
+                
+                <div className="bg-white rounded p-3 text-sm">
+                  <p className="text-gray-700">
+                    This signal counts "red flags" like curve inversions, spread blowouts, and funding stress. More red flags = higher risk of market disruption.
+                  </p>
+                </div>
               </div>
 
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">⚠️ Key Divergences</h3>
-                <p className="text-gray-700 text-sm">
-                  Explicitly flags when indicators send conflicting signals, with warning levels from None to Critical.
-                </p>
+              {/* Inflation Expectations */}
+              <div className="bg-green-50 rounded-lg p-6 border border-green-200">
+                <h3 className="text-xl font-semibold text-green-900 mb-3">5. Inflation Expectations</h3>
+                <p className="text-gray-700 mb-2"><strong>What it tells you:</strong> What markets expect for future inflation</p>
+                <p className="text-gray-700 mb-2"><strong>Based on:</strong> Long-term yields and curve steepness</p>
+                <p className="text-gray-700 mb-4"><strong>Time horizon:</strong> 2-10 years</p>
+                
+                <ul className="text-sm text-gray-700 space-y-1">
+                  <li><strong className="text-blue-700">Low Inflation:</strong> Long yields below 3%</li>
+                  <li><strong className="text-green-700">Normal:</strong> Long yields in historical ranges</li>
+                  <li><strong className="text-red-700">Elevated:</strong> Rising long-term yields signal inflation concerns</li>
+                </ul>
               </div>
             </div>
           </div>
 
-          {/* Key Relationships */}
-          <div className="bg-green-50 rounded-lg p-6 border border-green-200">
-            <h2 className="text-2xl font-semibold text-green-900 mb-4">Key Market Relationships</h2>
+          {/* Reading the Signals */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">Reading the Signals</h2>
+
+            {/* Confidence Levels */}
+            <div className="mb-6 bg-gray-50 rounded-lg p-6 border border-gray-200">
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Confidence Levels</h3>
+              <p className="text-gray-700 mb-4">Each signal comes with a confidence indicator:</p>
+              
+              <ul className="text-sm text-gray-700 space-y-2">
+                <li><strong className="text-green-700">High:</strong> All indicators agree</li>
+                <li><strong className="text-yellow-700">Moderate:</strong> Most indicators align</li>
+                <li><strong className="text-red-700">Low:</strong> Mixed or conflicting signals</li>
+              </ul>
+            </div>
+
+            {/* When Signals Disagree */}
+            <div className="mb-6 bg-yellow-50 rounded-lg p-6 border border-yellow-200">
+              <h3 className="text-xl font-semibold text-yellow-900 mb-4">When Signals Disagree</h3>
+              <p className="text-gray-700 mb-4">Sometimes signals conflict – this is valuable information:</p>
+              
+              <ul className="text-sm text-gray-700 space-y-2">
+                <li><strong>Economic Outlook bearish but Risk Environment calm?</strong> Markets may be complacent</li>
+                <li><strong>Rates Direction up but Bond Stress high?</strong> Fed may need to pause</li>
+              </ul>
+            </div>
+
+            {/* Rate of Change Matters */}
+            <div className="mb-6 bg-indigo-50 rounded-lg p-6 border border-indigo-200">
+              <h3 className="text-xl font-semibold text-indigo-900 mb-4">Rate of Change Matters</h3>
+              <p className="text-gray-700 mb-4">It's not just the level, but the speed of change:</p>
+              
+              <ul className="text-sm text-gray-700 space-y-2">
+                <li><strong>Rapid moves</strong> signal urgent shifts in sentiment</li>
+                <li><strong>Gradual changes</strong> suggest orderly transitions</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Using Signals Together */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">Using Signals Together</h2>
+            <p className="text-gray-700 mb-4">The signals work best as a system:</p>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">🟢 Risk-On Cascade</h3>
-                <p className="text-sm text-gray-700">
-                  Fed easing → Yield curve steepens → Credit spreads tighten → VIX falls
-                </p>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">🔴 Risk-Off Cascade</h3>
-                <p className="text-sm text-gray-700">
-                  Credit stress → VIX spikes → Fed responds → Yield curve flattens
-                </p>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">🟡 Late Cycle</h3>
-                <p className="text-sm text-gray-700">
-                  Fed tightening → Yield curve flattens → Credit spreads widen → VIX rises
-                </p>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">🟢 Recovery</h3>
-                <p className="text-sm text-gray-700">
-                  Fed easing → Credit spreads peak → VIX peaks → Yield curve steepens
-                </p>
-              </div>
+            <div className="bg-blue-50 rounded-lg p-6 border border-blue-200">
+              <ul className="text-gray-700 space-y-3">
+                <li className="flex items-start">
+                  <span className="text-blue-600 font-bold mr-3">1.</span>
+                  <span><strong>Check Economic Outlook</strong> for the big picture</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-600 font-bold mr-3">2.</span>
+                  <span><strong>Use Risk Environment</strong> for timing</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-600 font-bold mr-3">3.</span>
+                  <span><strong>Consider Policy Direction</strong> for rate exposure</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-600 font-bold mr-3">4.</span>
+                  <span><strong>Monitor Bond Stress</strong> for warning signs</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-600 font-bold mr-3">5.</span>
+                  <span><strong>Watch Inflation Expectations</strong> for long-term positioning</span>
+                </li>
+              </ul>
             </div>
           </div>
         </div>

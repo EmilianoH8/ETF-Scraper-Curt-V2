@@ -2,6 +2,8 @@
 
 A professional real-time bond market dashboard built for municipal research and fixed income analysis. Features live FRED API integration, yield curve visualization, market signals, and interpretive guidance.
 
+taskkill /f /im node.exe
+
 ## Features
 
 ### 📊 Key Metrics Display

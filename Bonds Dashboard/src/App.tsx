@@ -3,7 +3,7 @@ import { RefreshCw, AlertCircle } from 'lucide-react';
 import { DashboardData } from './types/bonds';
 import { fredApiService } from './services/fredApi';
 import MetricsGrid from './components/dashboard/MetricsGrid';
-import ChartsSection from './components/dashboard/ChartsSection';
+import OptimizedChartsSection from './components/dashboard/OptimizedChartsSection';
 import InterpretationPanel from './components/dashboard/InterpretationPanel';
 import MarketSignals from './components/signals/MarketSignals';
 import Guide from './components/guide/Guide';
@@ -194,10 +194,9 @@ const App: React.FC = () => {
                   <MetricsGrid data={dashboardData} />
                 </section>
 
-                {/* Charts Section */}
+                {/* Market Analysis Charts */}
                 <section>
-                  <h2 className="text-lg font-semibold text-gray-900 mb-4">Market Visualization</h2>
-                  <ChartsSection data={dashboardData} />
+                  <OptimizedChartsSection data={dashboardData} />
                 </section>
 
                 {/* Market Signals */}

@@ -96,17 +96,17 @@ const MetricsGrid: React.FC<MetricsGridProps> = ({ data }) => {
   const creditSpreadsFiltered = data.creditSpreads;
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 h-full">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 w-full">
       {/* Treasury Yields Box */}
-      <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-        <h3 className="text-base font-semibold text-gray-800 mb-3 border-b border-gray-100 pb-1">
+      <div className="bg-white border border-gray-200 rounded-lg p-2 shadow-sm">
+        <h3 className="text-xs font-semibold text-gray-800 mb-2 border-b border-gray-100 pb-1">
           Treasury Yields
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-1">
           {treasuryYieldsFiltered.map((yield_: TreasuryYield) => (
             <div 
               key={yield_.maturity} 
-              className="bg-gray-50 p-3 rounded border cursor-pointer hover:bg-gray-100 hover:shadow-md transition-all duration-200"
+              className="bg-gray-50 p-2 rounded border cursor-pointer hover:bg-gray-100 hover:shadow-md transition-all duration-200"
               onClick={() => handleIndicatorClick(yield_.maturity, 'treasury')}
               role="button"
               tabIndex={0}
@@ -119,12 +119,12 @@ const MetricsGrid: React.FC<MetricsGridProps> = ({ data }) => {
               title={`Click to view ${yield_.maturity} Treasury data on FRED`}
             >
               <div className="flex justify-between items-center mb-1">
-                <h4 className="text-sm font-medium text-gray-600">{yield_.maturity}</h4>
+                <h4 className="text-xs font-medium text-gray-600">{yield_.maturity}</h4>
                 <div className={`${getTrendColor(yield_.trend)}`}>
                   {getTrendIcon(yield_.trend)}
                 </div>
               </div>
-              <div className="text-xl font-bold text-gray-900 mb-1">{yield_.yield.toFixed(2)}%</div>
+              <div className="text-lg font-bold text-gray-900 mb-0.5">{yield_.yield.toFixed(2)}%</div>
               <div className={`text-xs ${getChangeColor(yield_.change)}`}>
                 {formatChange(yield_.change, 'bps')}
               </div>
@@ -134,15 +134,15 @@ const MetricsGrid: React.FC<MetricsGridProps> = ({ data }) => {
       </div>
 
       {/* Spreads Box */}
-      <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-        <h3 className="text-base font-semibold text-gray-800 mb-3 border-b border-gray-100 pb-1">
+      <div className="bg-white border border-gray-200 rounded-lg p-2 shadow-sm">
+        <h3 className="text-xs font-semibold text-gray-800 mb-2 border-b border-gray-100 pb-1">
           Spreads
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
           {data.yieldSpreads.map((spread: YieldSpread) => (
             <div 
               key={spread.name} 
-              className="bg-gray-50 p-3 rounded border cursor-pointer hover:bg-gray-100 hover:shadow-md transition-all duration-200"
+              className="bg-gray-50 p-2 rounded border cursor-pointer hover:bg-gray-100 hover:shadow-md transition-all duration-200"
               onClick={() => handleIndicatorClick(spread.name, 'spreads')}
               role="button"
               tabIndex={0}
@@ -155,14 +155,14 @@ const MetricsGrid: React.FC<MetricsGridProps> = ({ data }) => {
               title={`Click to view ${spread.name} data on FRED`}
             >
               <div className="flex justify-between items-center mb-1">
-                <h4 className="text-sm font-medium text-gray-600 truncate pr-2">{spread.name}</h4>
+                <h4 className="text-xs font-medium text-gray-600 truncate pr-1">{spread.name}</h4>
                 {spread.isInverted && (
                   <div title="Inverted Curve">
                     <AlertTriangle className="w-3 h-3 text-yellow-500 flex-shrink-0" />
                   </div>
                 )}
               </div>
-              <div className="text-xl font-bold text-gray-900 mb-1">
+              <div className="text-lg font-bold text-gray-900 mb-0.5">
                 {spread.value >= 0 ? '+' : ''}{spread.value.toFixed(2)}%
               </div>
               <div className={`text-xs ${getChangeColor(spread.change)}`}>
@@ -174,15 +174,15 @@ const MetricsGrid: React.FC<MetricsGridProps> = ({ data }) => {
       </div>
 
       {/* Market Indicators Box */}
-      <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-        <h3 className="text-base font-semibold text-gray-800 mb-3 border-b border-gray-100 pb-1">
+      <div className="bg-white border border-gray-200 rounded-lg p-2 shadow-sm">
+        <h3 className="text-xs font-semibold text-gray-800 mb-2 border-b border-gray-100 pb-1">
           Market Indicators
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-1">
           {marketIndicatorsFiltered.map((indicator: MarketIndicator) => (
             <div 
               key={indicator.name} 
-              className="bg-gray-50 p-3 rounded border cursor-pointer hover:bg-gray-100 hover:shadow-md transition-all duration-200"
+              className="bg-gray-50 p-2 rounded border cursor-pointer hover:bg-gray-100 hover:shadow-md transition-all duration-200"
               onClick={() => handleIndicatorClick(indicator.name, 'market')}
               role="button"
               tabIndex={0}
@@ -195,9 +195,9 @@ const MetricsGrid: React.FC<MetricsGridProps> = ({ data }) => {
               title={`Click to view ${indicator.name} data on FRED`}
             >
               <div className="mb-1">
-                <h4 className="text-sm font-medium text-gray-600 truncate">{indicator.name}</h4>
+                <h4 className="text-xs font-medium text-gray-600 truncate">{indicator.name}</h4>
               </div>
-              <div className="text-xl font-bold text-gray-900 mb-1">
+              <div className="text-lg font-bold text-gray-900 mb-0.5">
                 {indicator.name === 'S&P 500' 
                   ? indicator.value.toLocaleString('en-US', { maximumFractionDigits: 0 })
                   : indicator.value.toFixed(2)
@@ -213,16 +213,16 @@ const MetricsGrid: React.FC<MetricsGridProps> = ({ data }) => {
       </div>
 
       {/* Rates & Credit Box */}
-      <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-        <h3 className="text-base font-semibold text-gray-800 mb-3 border-b border-gray-100 pb-1">
+      <div className="bg-white border border-gray-200 rounded-lg p-2 shadow-sm">
+        <h3 className="text-xs font-semibold text-gray-800 mb-2 border-b border-gray-100 pb-1">
           Rates & Credit
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-1">
           {/* Policy Rates */}
           {policyRatesFiltered.map((rate: PolicyRate) => (
             <div 
               key={rate.name} 
-              className="bg-gray-50 p-3 rounded border cursor-pointer hover:bg-gray-100 hover:shadow-md transition-all duration-200"
+              className="bg-gray-50 p-2 rounded border cursor-pointer hover:bg-gray-100 hover:shadow-md transition-all duration-200"
               onClick={() => handleIndicatorClick(rate.name, 'rates')}
               role="button"
               tabIndex={0}
@@ -235,9 +235,9 @@ const MetricsGrid: React.FC<MetricsGridProps> = ({ data }) => {
               title={`Click to view ${rate.name} data on FRED`}
             >
               <div className="mb-1">
-                <h4 className="text-sm font-medium text-gray-600 truncate">{rate.name}</h4>
+                <h4 className="text-xs font-medium text-gray-600 truncate">{rate.name}</h4>
               </div>
-              <div className="text-xl font-bold text-gray-900 mb-1">{rate.rate.toFixed(2)}%</div>
+              <div className="text-lg font-bold text-gray-900 mb-0.5">{rate.rate.toFixed(2)}%</div>
               <div className={`text-xs ${getChangeColor(rate.change)}`}>
                 {formatChange(rate.change, 'bps')}
               </div>
@@ -248,7 +248,7 @@ const MetricsGrid: React.FC<MetricsGridProps> = ({ data }) => {
           {creditSpreadsFiltered.map((spread: CreditSpread) => (
             <div 
               key={spread.name} 
-              className="bg-gray-50 p-3 rounded border cursor-pointer hover:bg-gray-100 hover:shadow-md transition-all duration-200"
+              className="bg-gray-50 p-2 rounded border cursor-pointer hover:bg-gray-100 hover:shadow-md transition-all duration-200"
               onClick={() => handleIndicatorClick(spread.name, 'credit')}
               role="button"
               tabIndex={0}
@@ -261,14 +261,14 @@ const MetricsGrid: React.FC<MetricsGridProps> = ({ data }) => {
               title={`Click to view ${spread.name} data on FRED`}
             >
               <div className="flex justify-between items-center mb-1">
-                <h4 className="text-sm font-medium text-gray-600 truncate pr-2">{spread.name}</h4>
-                <span className={`text-xs px-2 py-0.5 rounded flex-shrink-0 ${
+                <h4 className="text-xs font-medium text-gray-600 truncate pr-1">{spread.name}</h4>
+                <span className={`text-xs px-1 py-0.5 rounded flex-shrink-0 ${
                   spread.rating === 'IG' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
                 }`}>
                   {spread.rating}
                 </span>
               </div>
-              <div className="text-xl font-bold text-gray-900 mb-1">{Math.round(spread.spread)} bps</div>
+              <div className="text-lg font-bold text-gray-900 mb-0.5">{Math.round(spread.spread)} bps</div>
               <div className={`text-xs ${getChangeColor(spread.change)}`}>
                 {formatChange(spread.change, 'bps')}
               </div>
