@@ -25,15 +25,15 @@ const MarketSignals: React.FC<MarketSignalsProps> = ({ data }) => {
     const twoYear = data.treasuryYields.find(y => y.maturity === '2Y')?.yield || 0;
     const tenYear = data.treasuryYields.find(y => y.maturity === '10Y')?.yield || 0;
     const thirtyYear = data.treasuryYields.find(y => y.maturity === '30Y')?.yield || 0;
-    const tenTwoSpread = data.yieldSpreads.find(s => s.name === '10Y-2Y')?.value || 0;
-    const thirtyTenSpread = data.yieldSpreads.find(s => s.name === '30Y-10Y')?.value || 0;
+    const tenTwoSpread = data.yieldSpreads.find(s => s.name === '10Y-2Y Spread')?.value || 0;
+    const thirtyTenSpread = data.yieldSpreads.find(s => s.name === '30Y-10Y Spread')?.value || 0;
     const sp500 = data.marketIndicators.find(i => i.name === 'S&P 500')?.value || 0;
     const vix = data.marketIndicators.find(i => i.name === 'VIX')?.value || 0;
     const dollarIndex = data.marketIndicators.find(i => i.name === 'Dollar Index')?.value || 0;
     const fedFunds = data.policyRates.find(r => r.name === 'Fed Funds')?.rate || 0;
     const sofr = data.policyRates.find(r => r.name === 'SOFR')?.rate || 0;
-    const igSpread = (data.creditSpreads.find(s => s.name === 'IG Spread')?.spread || 0) * 100;
-    const hySpread = (data.creditSpreads.find(s => s.name === 'HY Spread')?.spread || 0) * 100;
+    const igSpread = (data.creditSpreads.find(s => s.name === 'Investment Grade')?.spread || 0) * 100;
+    const hySpread = (data.creditSpreads.find(s => s.name === 'High Yield')?.spread || 0) * 100;
 
     return {
       twoYear, tenYear, thirtyYear, tenTwoSpread, thirtyTenSpread,
@@ -46,8 +46,8 @@ const MarketSignals: React.FC<MarketSignalsProps> = ({ data }) => {
     const twoYear = currentInputs.twoYear - (data.treasuryYields.find(y => y.maturity === '2Y')?.change || 0);
     const tenYear = currentInputs.tenYear - (data.treasuryYields.find(y => y.maturity === '10Y')?.change || 0);
     const thirtyYear = currentInputs.thirtyYear - (data.treasuryYields.find(y => y.maturity === '30Y')?.change || 0);
-    const tenTwoSpread = currentInputs.tenTwoSpread - (data.yieldSpreads.find(s => s.name === '10Y-2Y')?.change || 0);
-    const thirtyTenSpread = currentInputs.thirtyTenSpread - (data.yieldSpreads.find(s => s.name === '30Y-10Y')?.change || 0);
+    const tenTwoSpread = currentInputs.tenTwoSpread - (data.yieldSpreads.find(s => s.name === '10Y-2Y Spread')?.change || 0);
+    const thirtyTenSpread = currentInputs.thirtyTenSpread - (data.yieldSpreads.find(s => s.name === '30Y-10Y Spread')?.change || 0);
     
     return { twoYear, tenYear, thirtyYear, tenTwoSpread, thirtyTenSpread };
   }, [data, currentInputs]);
@@ -402,8 +402,8 @@ const MarketSignals: React.FC<MarketSignalsProps> = ({ data }) => {
                     <span className="text-gray-600">{key}:</span>
                     <span className="font-medium ml-1">
                       {typeof value === 'number' ? 
-                        (key.includes('Spread') || key.includes('Gap') ? 
-                          `${(value * 100).toFixed(0)}bps` : 
+                        (key.includes('Spread') || key.includes('Gap') || key.includes('igSpread') || key.includes('hySpread') ? 
+                          `${key.includes('igSpread') || key.includes('hySpread') ? value.toFixed(0) : (value * 100).toFixed(0)}bps` : 
                           value.toFixed(2)
                         ) : 
                         value
