@@ -1,0 +1,20 @@
+# BLS Unemployment Scraper Dependencies
+# Core HTTP and async libraries (should be available via scraping_hub)
+requests>=2.31.0
+aiohttp>=3.8.0
+asyncio
+
+# Data processing
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Data validation (if using Pydantic models from scraping_hub)
+pydantic>=2.0.0
+
+# Optional: For enhanced data analysis
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Development dependencies
+pytest>=7.0.0
+pytest-asyncio>=0.21.0 

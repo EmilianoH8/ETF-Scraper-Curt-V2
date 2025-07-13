@@ -1,0 +1,104 @@
+# Schwab ETF Fund Scraper Configuration
+# Application settings and parameters
+
+# Logging Configuration
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  directory: "logs"
+  console_output: true
+  file_output: true
+  structured_logging: true
+
+# Output Configuration
+output:
+  directory: "data"
+  excel_format: true
+  timestamp_files: true
+  backup_previous: true
+  
+# Schwab Scraping Configuration
+scraping:
+  # Primary method timeout (seconds)
+  request_timeout: 30
+  
+  # Retry configuration
+  max_retries: 3
+  retry_delay_base: 2  # Base delay for exponential backoff
+  retry_delay_max: 10  # Maximum delay between retries
+  
+  # Request delay to avoid rate limiting
+  request_delay: 2  # Seconds between requests
+  
+  # curl_cffi settings
+  impersonate_browser: "chrome131"
+  follow_redirects: true
+  
+  # Anti-detection settings
+  user_agent_rotation: true
+  respect_robots_txt: false
+  concurrent_requests: 3  # Conservative for Schwab
+  
+# Schwab-specific settings
+schwab:
+  # Iframe handling
+  handle_iframes: true
+  iframe_timeout: 15
+  
+  # Data extraction preferences
+  prioritize_labeled_data: true
+  validate_yield_range: true
+  min_yield_threshold: 0.01  # 0.01%
+  max_yield_threshold: 20.0  # 20%
+  
+# Data Validation
+validation:
+  require_ticker: true
+  require_sec_yield: true
+  allow_missing_other_fields: true
+  validate_percentage_format: true
+  clean_ticker_symbols: true
+
+# Excel Output Formatting
+excel_formatting:
+  apply_professional_styling: true
+  freeze_header_row: true
+  auto_adjust_columns: true
+  percentage_format: "0.00%"
+  date_format: "YYYY-MM-DD HH:mm:ss"
+  
+# Daily Automation
+automation:
+  # File naming
+  timestamp_format: "%Y%m%d_%H%M%S"
+  daily_filename_format: "schwab_etf_funds_{date}.xlsx"
+  backup_filename_format: "{original}_backup_{timestamp}.xlsx"
+  
+  # Comparison settings
+  compare_with_previous: true
+  previous_file_pattern: "schwab_etf_funds_*.xlsx"
+  
+  # Email notifications (configure SMTP settings separately)
+  send_email_notifications: false
+  email_on_success: true
+  email_on_failure: true
+  email_on_changes: true
+  
+# Performance Monitoring
+performance:
+  track_response_times: true
+  log_memory_usage: true
+  profile_execution: false
+  
+# Error Handling
+error_handling:
+  continue_on_single_failure: true
+  fail_threshold_percentage: 50  # Fail entire run if more than X% of funds fail
+  log_all_errors: true
+  create_error_report: true
+
+# Development/Testing
+development:
+  test_mode: false
+  test_fund_limit: 5  # Limit number of funds to process in test mode
+  debug_requests: false
+  save_html_responses: false 

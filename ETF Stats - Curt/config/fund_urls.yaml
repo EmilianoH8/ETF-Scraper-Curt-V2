@@ -1,0 +1,100 @@
+# Schwab ETF Fund URLs
+# Schwab ETF research URLs for fund data scraping
+
+# IMPORTANT: All URLs must be Schwab ETF research URLs
+# Format: https://www.schwab.com/research/etfs/quotes/summary/{ticker}
+
+# ETF Funds
+etf_funds:
+  # Ultra Short Municipal Income ETF
+  - name: "JP Morgan Ultra Short Municipal Income ETF"
+    ticker: "JMST"
+    url: "https://www.schwab.com/research/etfs/quotes/summary/jmst"
+    active: true
+    
+  # Osterweis Strategic Income Fund
+  - name: "Osterweis Strategic Income Fund"
+    ticker: "OSTX"
+    url: "https://www.schwab.com/research/etfs/quotes/summary/ostx"
+    active: true
+    
+  # Runyon Core Income Fund
+  - name: "Runyon Core Income Fund"
+    ticker: "RUNFX"
+    url: "https://www.schwab.com/research/etfs/quotes/summary/runfx"
+    active: true
+    
+  # JPMorgan Income Trust
+  - name: "JPMorgan Income Trust"
+    ticker: "JITZX"
+    url: "https://www.schwab.com/research/etfs/quotes/summary/jitzx"
+    active: true
+    
+  # JPMorgan New York Income Fund
+  - name: "JPMorgan New York Income Fund"
+    ticker: "JNYIX"
+    url: "https://www.schwab.com/research/etfs/quotes/summary/jnyix"
+    active: true
+    
+  # T. Rowe Price Tax-Free High Yield Fund
+  - name: "T. Rowe Price Tax-Free High Yield Fund"
+    ticker: "TXRRX"
+    url: "https://www.schwab.com/research/etfs/quotes/summary/txrrx"
+    active: true
+    
+  # United States Monthly Income Fund
+  - name: "United States Monthly Income Fund"
+    ticker: "USMTX"
+    url: "https://www.schwab.com/research/etfs/quotes/summary/usmtx"
+    active: true
+    
+  # JPMorgan Ultra-Short Municipal Income ETF
+  - name: "JPMorgan Ultra-Short Municipal Income ETF"
+    ticker: "JMUB"
+    url: "https://www.schwab.com/research/etfs/quotes/summary/jmub"
+    active: true
+    
+  # JPMorgan High Yield Municipal ETF
+  - name: "JPMorgan High Yield Municipal ETF"
+    ticker: "JMHI"
+    url: "https://www.schwab.com/research/etfs/quotes/summary/jmhi"
+    active: true
+    
+  # JPMorgan Short Duration Income ETF
+  - name: "JPMorgan Short Duration Income ETF"
+    ticker: "JMSI"
+    url: "https://www.schwab.com/research/etfs/quotes/summary/jmsi"
+    active: true
+    
+  # JPMorgan Income Building ETF
+  - name: "JPMorgan Income Building ETF"
+    ticker: "JPICX"
+    url: "https://www.schwab.com/research/etfs/quotes/summary/jpicx"
+    active: true
+
+# Configuration for URL management
+url_config:
+  # Base URL pattern for Schwab ETF research
+  base_url: "https://www.schwab.com/research/etfs/quotes/summary/"
+  
+  # URL validation
+  require_schwab_domain: true
+  validate_urls_before_scraping: true
+  
+  # URL discovery settings
+  enable_auto_discovery: false
+  discovery_base_url: "https://www.schwab.com/research/etfs/"
+  
+# Metadata
+metadata:
+  last_updated: "2024-01-01"
+  total_funds: 11
+  active_funds: 11
+  source: "Schwab ETF Research Website"
+  data_fields:
+    - "Ticker symbol"
+    - "SEC Yield (30-Day)"
+    - "Expense Ratio"
+    - "Fund Name"
+    - "Price"
+    - "Net Assets" 

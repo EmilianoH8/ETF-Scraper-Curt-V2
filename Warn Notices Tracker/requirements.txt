@@ -1,0 +1,21 @@
+# Core HTTP and scraping dependencies
+curl_cffi>=0.5.10
+selectolax>=0.3.17
+pydantic>=2.5.0
+tenacity>=8.2.3
+loguru>=0.7.2
+
+# Data processing and storage
+pandas>=2.1.0
+sqlalchemy>=2.0.0
+
+# Async and utilities
+aiofiles>=23.2.0
+python-dateutil>=2.8.2
+pytz>=2023.3
+
+# Development and testing
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+black>=23.0.0
+flake8>=6.0.0 

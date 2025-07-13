@@ -1,0 +1,54 @@
+{
+  "vqlCmdResponse": {
+    "layoutStatus": {
+      "active_tab": "WARN",
+      "isViewModified": false,
+      "undoPosition": 3,
+      "urlActionList": [],
+      "vizStateList": [],
+      "applicationPresModel": {
+        "renderMode": "render-mode-server",
+        "dateFormat": "M/d/yyyy",
+        "timeFormat": "h:mm\u202ftt",
+        "numberFormats": [
+          "",
+          "-1",
+          "t",
+          "",
+          "",
+          "",
+          "0",
+          ".",
+          ",",
+          "3;0"
+        ],
+        "presentationLayerNotification": [
+          {
+            "keyId": "doc:workbook-changed-event",
+            "presModelHolder": {}
+          },
+          {
+            "keyId": "doc:editor-commit-ended-event",
+            "presModelHolder": {
+              "genModifiedDataSourcesPresModel": {
+                "dataSourceNames": [],
+                "updateDataQualityWarnings": false
+              }
+            }
+          }
+        ]
+      },
+      "isWorldNew": false,
+      "guid": ""
+    },
+    "cmdResultList": [
+      {
+        "commandName": "tabdoc:categorical-filter",
+        "commandReturn": {
+          "fieldCaption": "YEAR(Date of WARN Notice)",
+          "fn": "[federated.1a1bxuc1mfvu4613fgcc20hkpv80].[yr:Date of WARN Notice:ok]"
+        }
+      }
+    ]
+  }
+}

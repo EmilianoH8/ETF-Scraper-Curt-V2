@@ -1,0 +1,64 @@
+# Scraping Hub Core Dependencies
+# This file contains all the essential packages for our ETL scraping architecture
+# Following the tech stack priorities from ProjectOverview.mcp
+
+# HTTP Clients (Priority Order)
+curl-cffi==0.7.0              # Primary TLS fingerprint masking client
+tls-client==1.0.1              # Backup TLS masking solution
+httpx==0.27.0                  # Async HTTP client for API requests
+requests==2.31.0               # Fallback HTTP client
+
+# Browser Automation (Priority Order)
+nodriver==0.28                 # Primary undetected Chrome automation
+playwright==1.48.0             # Fallback browser automation
+undetected-chromedriver==3.5.5 # Legacy browser automation support
+
+# Data Processing & Validation
+selectolax==0.3.21             # Fast HTML parsing (10x faster than BeautifulSoup)
+pydantic==2.9.2                # Data validation and modeling
+pandas==2.2.3                  # Data manipulation and analysis
+lxml==5.3.0                    # XML/HTML processing
+beautifulsoup4==4.12.3         # Fallback HTML parser
+
+# Async & Concurrency
+asyncio==3.4.3                 # Async programming support
+aiofiles==24.1.0               # Non-blocking file operations
+aiohttp==3.10.11               # Alternative async HTTP client
+
+# Error Handling & Retry Logic
+tenacity==9.0.0                # Retry logic with exponential backoff
+backoff==2.2.1                 # Alternative retry mechanism
+
+# Logging & Monitoring
+loguru==0.7.2                  # Advanced logging with rotation and filtering
+structlog==24.4.0              # Structured logging
+
+# Storage & Database
+sqlite3                        # Built-in SQLite support
+psycopg2-binary==2.9.9         # PostgreSQL adapter
+redis==5.1.1                   # Redis client for caching
+sqlalchemy==2.0.36             # SQL toolkit and ORM
+
+# Utilities & Helpers
+python-dotenv==1.0.1           # Environment variable management
+fake-useragent==1.5.1          # User agent rotation
+pycryptodome==3.21.0           # Cryptographic functions
+pillow==10.4.0                 # Image processing
+python-dateutil==2.9.0         # Date parsing utilities
+urllib3==2.2.3                 # HTTP library
+
+# Development & Testing
+pytest==8.3.3                  # Testing framework
+pytest-asyncio==0.24.0         # Async testing support
+black==24.10.0                 # Code formatting
+flake8==7.1.1                  # Code linting
+mypy==1.13.0                   # Static type checking
+
+# Optional Advanced Features
+scrapy==2.11.2                 # Alternative scraping framework
+selenium==4.27.1               # Legacy browser automation
+mitmproxy==10.4.2              # HTTP(S) proxy for debugging
+
+# Performance & Monitoring
+memory-profiler==0.61.0        # Memory usage monitoring
+py-spy==0.3.14                 # Python profiler 
