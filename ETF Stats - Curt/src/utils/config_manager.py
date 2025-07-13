@@ -74,10 +74,6 @@ class AutomationConfig(BaseModel):
     backup_filename_format: str = "{original}_backup_{timestamp}.xlsx"
     compare_with_previous: bool = True
     previous_file_pattern: str = "jp_morgan_funds_*.xlsx"
-    send_email_notifications: bool = False
-    email_on_success: bool = True
-    email_on_failure: bool = True
-    email_on_changes: bool = True
 
 
 class ErrorHandlingConfig(BaseModel):
@@ -96,154 +92,130 @@ class DevelopmentConfig(BaseModel):
     save_html_responses: bool = False
 
 
+class ETFConfig(BaseModel):
+    """Root configuration model."""
+    funds: List[FundConfig] = []
+    scraping: ScrapingConfig = Field(default_factory=ScrapingConfig)
+    logging: LoggingConfig = Field(default_factory=LoggingConfig)
+    output: OutputConfig = Field(default_factory=OutputConfig)
+    validation: ValidationConfig = Field(default_factory=ValidationConfig)
+    automation: AutomationConfig = Field(default_factory=AutomationConfig)
+    error_handling: ErrorHandlingConfig = Field(default_factory=ErrorHandlingConfig)
+    development: DevelopmentConfig = Field(default_factory=DevelopmentConfig)
+
+
 class ConfigManager:
-    """Configuration manager for loading and managing application settings."""
+    """Configuration manager for ETF scraper."""
     
     def __init__(self, config_dir: str = "config"):
-        """
-        Initialize configuration manager.
-        
-        Args:
-            config_dir: Directory containing configuration files
-        """
+        """Initialize configuration manager."""
         self.config_dir = Path(config_dir)
+        self.settings_file = self.config_dir / "settings.yaml"
+        self.fund_urls_file = self.config_dir / "fund_urls.yaml"
         self.settings = None
-        self.fund_urls = None
         
-        # Load configurations
+        # Create config directory if it doesn't exist
+        self.config_dir.mkdir(exist_ok=True)
+        
+        # Load initial configuration
         self._load_settings()
         self._load_fund_urls()
-        
-        logger.info(f"Configuration loaded from {self.config_dir}")
     
     def _load_settings(self):
-        """Load application settings from YAML file."""
-        settings_file = self.config_dir / "settings.yaml"
-        
-        if not settings_file.exists():
-            logger.warning(f"Settings file not found: {settings_file}")
-            self.settings = self._get_default_settings()
-            return
-        
-        try:
-            with open(settings_file, 'r') as f:
-                settings_data = yaml.safe_load(f)
+        """Load settings from YAML file."""
+        if self.settings_file.exists():
+            try:
+                with open(self.settings_file, 'r', encoding='utf-8') as f:
+                    settings_data = yaml.safe_load(f) or {}
+                
+                # Validate and create ETFConfig object
+                self.settings = ETFConfig(**settings_data)
+                logger.info(f"Settings loaded from {self.settings_file}")
+                
+            except Exception as e:
+                logger.error(f"Error loading settings from {self.settings_file}: {e}")
+                logger.info("Using default settings")
+                self.settings = ETFConfig(**self._get_default_settings())
+        else:
+            logger.warning(f"Settings file not found: {self.settings_file}")
+            logger.info("Creating default settings")
+            self.settings = ETFConfig(**self._get_default_settings())
             
-            # Parse settings into structured models
-            self.settings = {
-                'logging': LoggingConfig(**settings_data.get('logging', {})),
-                'output': OutputConfig(**settings_data.get('output', {})),
-                'scraping': ScrapingConfig(**settings_data.get('scraping', {})),
-                'validation': ValidationConfig(**settings_data.get('validation', {})),
-                'automation': AutomationConfig(**settings_data.get('automation', {})),
-                'error_handling': ErrorHandlingConfig(**settings_data.get('error_handling', {})),
-                'development': DevelopmentConfig(**settings_data.get('development', {})),
-                'raw': settings_data  # Keep raw data for any additional settings
-            }
-            
-            logger.debug(f"Settings loaded successfully from {settings_file}")
-            
-        except Exception as e:
-            logger.error(f"Failed to load settings: {e}")
-            self.settings = self._get_default_settings()
+            # Create default settings file
+            try:
+                with open(self.settings_file, 'w', encoding='utf-8') as f:
+                    yaml.safe_dump(self.settings.dict(), f, default_flow_style=False, sort_keys=False)
+                logger.info(f"Default settings created at {self.settings_file}")
+            except Exception as e:
+                logger.error(f"Failed to create default settings file: {e}")
     
     def _load_fund_urls(self):
         """Load fund URLs from YAML file."""
-        urls_file = self.config_dir / "fund_urls.yaml"
-        
-        if not urls_file.exists():
-            logger.warning(f"Fund URLs file not found: {urls_file}")
-            self.fund_urls = {'all_funds': [], 'active_funds': []}
-            return
-        
-        try:
-            with open(urls_file, 'r') as f:
-                urls_data = yaml.safe_load(f)
-            
-            # Parse fund URLs into structured format
-            all_funds = []
-            
-            # Combine all fund categories
-            for category in ['etf_funds', 'mutual_funds', 'money_market_funds', 'bond_funds']:
-                if category in urls_data:
-                    for fund_data in urls_data[category]:
-                        fund_config = FundConfig(**fund_data)
-                        fund_config.category = category  # Add category info
-                        all_funds.append(fund_config)
-            
-            # Filter active funds
-            active_funds = [f for f in all_funds if f.active]
-            
-            self.fund_urls = {
-                'all_funds': all_funds,
-                'active_funds': active_funds,
-                'metadata': urls_data.get('metadata', {}),
-                'url_config': urls_data.get('url_config', {}),
-                'raw': urls_data
-            }
-            
-            logger.info(f"Loaded {len(all_funds)} funds ({len(active_funds)} active) from {urls_file}")
-            
-        except Exception as e:
-            logger.error(f"Failed to load fund URLs: {e}")
-            self.fund_urls = {'all_funds': [], 'active_funds': []}
+        if self.fund_urls_file.exists():
+            try:
+                with open(self.fund_urls_file, 'r', encoding='utf-8') as f:
+                    fund_data = yaml.safe_load(f) or {}
+                
+                # Extract fund list and validate
+                funds_list = fund_data.get('etf_funds', [])
+                self.settings.funds = [FundConfig(**fund) for fund in funds_list]
+                
+                logger.info(f"Fund URLs loaded from {self.fund_urls_file}")
+                logger.info(f"Loaded {len(self.settings.funds)} fund configurations")
+                
+            except Exception as e:
+                logger.error(f"Error loading fund URLs from {self.fund_urls_file}: {e}")
+                self.settings.funds = []
+        else:
+            logger.warning(f"Fund URLs file not found: {self.fund_urls_file}")
+            self.settings.funds = []
     
     def _get_default_settings(self) -> Dict[str, Any]:
-        """Get default settings if configuration file is missing."""
+        """Get default configuration settings."""
         return {
-            'logging': LoggingConfig(),
-            'output': OutputConfig(),
-            'scraping': ScrapingConfig(),
-            'validation': ValidationConfig(),
-            'automation': AutomationConfig(),
-            'error_handling': ErrorHandlingConfig(),
-            'development': DevelopmentConfig(),
-            'raw': {}
+            'scraping': ScrapingConfig().dict(),
+            'logging': LoggingConfig().dict(),
+            'output': OutputConfig().dict(),
+            'validation': ValidationConfig().dict(),
+            'automation': AutomationConfig().dict(),
+            'error_handling': ErrorHandlingConfig().dict(),
+            'development': DevelopmentConfig().dict()
         }
     
     def get_active_fund_urls(self) -> List[str]:
-        """Get list of active fund URLs for scraping."""
-        if not self.fund_urls or not self.fund_urls['active_funds']:
-            logger.warning("No active fund URLs found")
+        """Get list of active fund URLs."""
+        if not self.settings or not self.settings.funds:
             return []
         
-        urls = [fund.url for fund in self.fund_urls['active_funds']]
-        logger.debug(f"Retrieved {len(urls)} active fund URLs")
-        return urls
+        return [fund.url for fund in self.settings.funds if fund.active]
     
     def get_fund_by_ticker(self, ticker: str) -> Optional[FundConfig]:
         """Get fund configuration by ticker symbol."""
-        if not self.fund_urls:
+        if not self.settings or not self.settings.funds:
             return None
         
-        for fund in self.fund_urls['all_funds']:
+        for fund in self.settings.funds:
             if fund.ticker.upper() == ticker.upper():
                 return fund
-        
         return None
     
     def get_fund_by_url(self, url: str) -> Optional[FundConfig]:
         """Get fund configuration by URL."""
-        if not self.fund_urls:
+        if not self.settings or not self.settings.funds:
             return None
         
-        for fund in self.fund_urls['all_funds']:
+        for fund in self.settings.funds:
             if fund.url == url:
                 return fund
-        
         return None
     
     def is_test_mode(self) -> bool:
-        """Check if application is running in test mode."""
+        """Check if running in test mode."""
         return self.settings['development'].test_mode if self.settings else False
     
     def get_test_fund_limit(self) -> int:
         """Get the fund limit for test mode."""
         return self.settings['development'].test_fund_limit if self.settings else 5
-    
-    def should_send_emails(self) -> bool:
-        """Check if email notifications are enabled."""
-        return self.settings['automation'].send_email_notifications if self.settings else False
     
     def get_output_directory(self) -> str:
         """Get the configured output directory."""
@@ -258,25 +230,22 @@ class ConfigManager:
         return self.settings['scraping'] if self.settings else ScrapingConfig()
     
     def validate_configuration(self) -> List[str]:
-        """Validate configuration and return list of issues."""
+        """Validate current configuration and return list of issues."""
         issues = []
         
-        # Check if essential files exist
-        if not (self.config_dir / "settings.yaml").exists():
-            issues.append("settings.yaml file is missing")
+        if not self.settings:
+            issues.append("No settings loaded")
+            return issues
         
-        if not (self.config_dir / "fund_urls.yaml").exists():
-            issues.append("fund_urls.yaml file is missing")
-        
-        # Check if we have active funds
-        if not self.fund_urls or not self.fund_urls['active_funds']:
-            issues.append("No active funds configured for scraping")
+        # Check for active funds
+        active_funds = [f for f in self.settings.funds if f.active]
+        if not active_funds:
+            issues.append("No active funds configured")
         
         # Validate fund URLs
-        if self.fund_urls and self.fund_urls['active_funds']:
-            for fund in self.fund_urls['active_funds']:
-                if '/institutional/' not in fund.url:
-                    issues.append(f"Fund {fund.ticker} may not have institutional view URL")
+        for fund in active_funds:
+            if not fund.url or not fund.url.startswith('http'):
+                issues.append(f"Invalid URL for fund {fund.ticker}: {fund.url}")
         
         return issues
     
@@ -290,7 +259,7 @@ class ConfigManager:
 
 def load_config(config_dir: str = "config") -> ConfigManager:
     """
-    Load configuration manager instance.
+    Load configuration manager.
     
     Args:
         config_dir: Directory containing configuration files
